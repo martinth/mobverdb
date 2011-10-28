@@ -8,7 +8,8 @@
   <packaging>jar</packaging>
 
   <name>mobverdb</name>
-  <url>http://maven.apache.org</url>
+  <description>Mobile und verteilte Datenbanken WS1112</description>
+  <url>https://github.com/Blattlaus/mobverdb</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,14 +19,31 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
     	<version>1.2.16</version>
-    	<type>bundle</type>
     </dependency>
   </dependencies>
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-compiler-plugin</artifactId>
+  			<version>2.3.2</version>
+  			<configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+            </configuration>
+  		</plugin>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-surefire-plugin</artifactId>
+  			<version>2.10</version>
+  		</plugin>
+  	</plugins>
+  </build>
 </project>

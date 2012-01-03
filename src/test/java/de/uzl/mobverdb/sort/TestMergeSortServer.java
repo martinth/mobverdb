@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Ordering;
 
-public class TestMergSortServer {
+public class TestMergeSortServer {
     
     private static Registry reg;
 

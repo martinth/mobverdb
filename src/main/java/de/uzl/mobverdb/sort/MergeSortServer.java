@@ -1,59 +1,28 @@
 package de.uzl.mobverdb.sort;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.common.base.Preconditions;
 
 import com.google.common.collect.Iterables;
+
+import de.uzl.mobverdb.sort.base.BaseSortServer;
+import de.uzl.mobverdb.sort.base.CachingSortClientWrapper;
 
 /**
  * Implements a distributes merge sort.
  * @author Martin Thurau
  *
  */
-public class Server implements ISortServer, Serializable {
-	
-	/** generated */
+public class MergeSortServer extends BaseSortServer  {
+    
+    /** generated */
     private static final long serialVersionUID = 3753586170293486054L;
-    /** all clients that have registered themselves */
-	private List<CachingSortClientWrapper> registeredClients;
-	/** data that will get sorted */
-	private Collection<String> toBeSorted;
-	/** if we are currently sorting */
-	private AtomicBoolean currentlySorting = new AtomicBoolean();
-	
-	public Server() {
-		this.registeredClients = new ArrayList<CachingSortClientWrapper>();
-		this.toBeSorted = new ArrayList<String>();
-	}
 
-	public boolean registerClient(ISortClient client) throws RemoteException {
-		if(currentlySorting.get()) {
-			return false;
-		} else {
-			this.registeredClients.add(new CachingSortClientWrapper(client, 10));
-			return true;
-		} 
-	}
-
-	public void add(String element) {
-		Preconditions.checkState(!currentlySorting.get(), "You cannot add elements after calling sort()");
-		this.toBeSorted.add(element);
-	}
-
-	public void sort() throws RemoteException {
-		Preconditions.checkState(this.registeredClients.size() > 0, "their must be at least one client registered to sort");
-		Preconditions.checkState(this.toBeSorted.size() > 0, "their must be at least one element to be sorted");
-		Preconditions.checkState(!currentlySorting.get(), "sort() was already called");
-
-		currentlySorting.set(true);
-		 
+	@Override
+    protected void distributeWork() throws RemoteException {
 		int sliceSize = (int) Math.ceil(((float)this.toBeSorted.size()) / this.registeredClients.size());
 		Iterator<CachingSortClientWrapper> clientsToBeUsed = this.registeredClients.iterator();
 		for(List<String> subList : Iterables.partition(this.toBeSorted, sliceSize)) {
@@ -62,7 +31,8 @@ public class Server implements ISortServer, Serializable {
 		}
 	}
 
-	public Iterator<String> iterator() {
+	@Override
+    protected Iterator<String> getIterator() {
 		Preconditions.checkState(currentlySorting.get(), "sort() must be called before iterating");
 		
 		

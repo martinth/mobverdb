@@ -8,7 +8,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Client implements ISortClient, Serializable {
+import de.uzl.mobverdb.sort.base.ISortClient;
+
+public class MergeSortClient implements ISortClient, Serializable {
 	
 	/** generated */
     private static final long serialVersionUID = -4469350325989245038L;

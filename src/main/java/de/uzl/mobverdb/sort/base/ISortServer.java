@@ -1,4 +1,4 @@
-package de.uzl.mobverdb.sort;
+package de.uzl.mobverdb.sort.base;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

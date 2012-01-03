@@ -57,7 +57,8 @@ public class CachingSortClientWrapper {
 		return dataCache.poll();
 	}
 	
-	public boolean isFinished() {
+	public boolean isFinished() throws RemoteException {
+	    refillIfNeeded();
 		return dataCache.isEmpty() && this.clientEmpty;
 	}
 	

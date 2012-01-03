@@ -19,7 +19,9 @@ import com.google.common.collect.Iterables;
  */
 public class Server implements ISortServer, Serializable {
 	
-	/** all clients that have registered themselves */
+	/** generated */
+    private static final long serialVersionUID = 3753586170293486054L;
+    /** all clients that have registered themselves */
 	private List<CachingSortClientWrapper> registeredClients;
 	/** data that will get sorted */
 	private Collection<String> toBeSorted;
@@ -82,6 +84,7 @@ public class Server implements ISortServer, Serializable {
 						
 						
 					}
+	
 					return min.getNext();
 				} catch (RemoteException e) {
 					/* this is a stupid idea, but since we MUST implement an Interator we must
@@ -95,9 +98,13 @@ public class Server implements ISortServer, Serializable {
 			public boolean hasNext() {
 				// as long as there is one unfinished client we have data
 				for (CachingSortClientWrapper client : registeredClients) {
-					if(!client.isFinished()) {
-						return true;
-					}
+					try {
+                        if(!client.isFinished()) {
+                        	return true;
+                        }
+                    } catch (RemoteException e) {
+                        
+                    }
 				}
 				return false;
 			}

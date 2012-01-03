@@ -10,7 +10,9 @@ import java.util.List;
 
 public class Client implements ISortClient, Serializable {
 	
-	private Iterator<String> iter;
+	/** generated */
+    private static final long serialVersionUID = -4469350325989245038L;
+    private Iterator<String> iter;
 	private List<String> sorted;
 
 	public void putWork(List<String> data) throws RemoteException {

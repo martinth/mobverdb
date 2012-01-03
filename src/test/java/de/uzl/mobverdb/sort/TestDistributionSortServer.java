@@ -14,14 +14,14 @@ import org.junit.Test;
 
 import com.google.common.collect.Ordering;
 
-public class TestMergeSortServer {
+public class TestDistributionSortServer {
     
     private static Registry reg;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         reg = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
-        Naming.rebind("server", new MergeSortServer());
+        Naming.rebind("server", new DistributionSortServer());
     }
     
     /**
@@ -40,13 +40,14 @@ public class TestMergeSortServer {
 
     @Test(expected=IllegalStateException.class)
     public void testNoClient() throws MalformedURLException, RemoteException, NotBoundException {
-        MergeSortServer server = fillServerRandom(1000);
+        DistributionSortServer server = fillServerRandom(1000);
         server.sort();
     }
     
+    
     @Test
     public void testOneClient() throws MalformedURLException, RemoteException, NotBoundException {
-        MergeSortServer server = fillServerRandom(1000);
+        DistributionSortServer server = fillServerRandom(1000);
         server.registerClient(new SortClient());
         server.sort();
         assertTrue(Ordering.natural().isOrdered(server));
@@ -55,7 +56,7 @@ public class TestMergeSortServer {
     @Test
     public void testMultipleClients() throws MalformedURLException, RemoteException, NotBoundException {
         for(int i = 2; i<10; i++) {
-            MergeSortServer server = fillServerRandom(1000);
+            DistributionSortServer server = fillServerRandom(1000);
             for(int j=0; j < i; j++) {
                 server.registerClient(new SortClient());
             }
@@ -64,14 +65,14 @@ public class TestMergeSortServer {
         }
      
     }
-    
+
     /**
      * Create a new Server fill it with a given amount of random strings (length 1-15 chars)
      */
-    private MergeSortServer fillServerRandom(int amount) throws MalformedURLException, RemoteException, NotBoundException {
+    private DistributionSortServer fillServerRandom(int amount) throws MalformedURLException, RemoteException, NotBoundException {
         
         Random rand = new Random();
-        MergeSortServer server = (MergeSortServer)  Naming.lookup("//127.0.0.1/server");
+        DistributionSortServer server = (DistributionSortServer)  Naming.lookup("//127.0.0.1/server");
         for(int i = 0; i < amount; i++) {
             server.add(generateString(rand, rand.nextInt(15)+1));
         }

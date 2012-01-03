@@ -10,7 +10,7 @@ import java.util.List;
 
 import de.uzl.mobverdb.sort.base.ISortClient;
 
-public class MergeSortClient implements ISortClient, Serializable {
+public class SortClient implements ISortClient, Serializable {
 	
 	/** generated */
     private static final long serialVersionUID = -4469350325989245038L;

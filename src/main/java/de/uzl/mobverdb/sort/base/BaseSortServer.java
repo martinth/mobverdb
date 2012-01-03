@@ -3,7 +3,6 @@ package de.uzl.mobverdb.sort.base;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +16,7 @@ public abstract class BaseSortServer implements ISortServer, Serializable {
     /** all clients that have registered themselves */
     protected List<CachingSortClientWrapper> registeredClients;
     /** data that will get sorted */
-    protected Collection<String> toBeSorted;
+    protected List<String> toBeSorted;
     /** if we are currently sorting */
     protected AtomicBoolean currentlySorting = new AtomicBoolean();
 

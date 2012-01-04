@@ -7,12 +7,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import com.google.common.base.Preconditions;
 
-import com.google.common.collect.Iterables;
-
 import de.uzl.mobverdb.sort.base.BaseSortServer;
-import de.uzl.mobverdb.sort.base.CachingSortClientWrapper;
 
 /**
  * Implements a distributes merge sort.
@@ -20,7 +18,7 @@ import de.uzl.mobverdb.sort.base.CachingSortClientWrapper;
  *
  */
 public class DistributionSortServer extends BaseSortServer  {
-    
+        
     /** generated */
     private static final long serialVersionUID = 3753586170293486054L;
 

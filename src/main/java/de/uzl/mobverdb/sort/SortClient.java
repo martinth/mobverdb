@@ -12,11 +12,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.collect.Lists;
 
 import de.uzl.mobverdb.sort.base.ISortClient;
 
 public class SortClient implements ISortClient, Serializable {
+    
+    private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
 	
 	/** generated */
     private static final long serialVersionUID = -4469350325989245038L;
@@ -33,6 +37,7 @@ public class SortClient implements ISortClient, Serializable {
 	 */
 	public void putWork(List<String> data) throws RemoteException {
 		toBeSorted = Lists.newArrayList(data);
+		log.debug("Got data to be sorted");
 		
 		/* the actual sorting will be done in a different thread so that this
 		 * method can return as fast as possible */
@@ -40,11 +45,12 @@ public class SortClient implements ISortClient, Serializable {
             @Override
             public Iterator<String> call() throws Exception {
                 Collections.sort(toBeSorted);
+                log.debug("Sorter task finished sorting");
                 return toBeSorted.iterator();
             }
         });
 		executor.execute(sorterTask);
-		
+		log.debug("Created and executed sorter task");
 	}
 	
 	/**
@@ -67,11 +73,22 @@ public class SortClient implements ISortClient, Serializable {
             		break;
             	}
             }
+            log.debug(String.format("Got request for %d items. Returning %d", blockSize, ret.size()));
             return ret;
         } catch (InterruptedException e) {
             throw new RemoteException("Sorting was interrupted.", e);
         } catch (ExecutionException e) {
             throw new RemoteException("An exception occured in the sorting task.", e);
+        }
+	}
+	
+	public boolean isFinished() {
+	    try {
+            return sorterTask != null && sorterTask.isDone() && sorterTask.get().hasNext();
+        } catch (InterruptedException e) {
+            return true;
+        } catch (ExecutionException e) {
+            return true;
         }
 	}
 

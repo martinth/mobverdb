@@ -30,11 +30,13 @@ public class SortServer extends Thread {
     
     private Stopwatch addWatch = new Stopwatch();
     private Stopwatch iterateWatch = new Stopwatch();
+    private int blockSize;
 
     public SortServer(int numClients, boolean useDistSort, String inputData, int blockSize) throws IOException {
         this.server = useDistSort ? new DistributionSort(blockSize) : new MergeSort(blockSize);
         this.inputData = inputData;
         this.numClients = numClients;
+        this.blockSize = blockSize;
         
         Registry reg = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
         reg.rebind(SERVER_NAME, server);
@@ -92,8 +94,9 @@ public class SortServer extends Thread {
         try {
             FileWriter fstream = new FileWriter(PERF_FILE);
             BufferedWriter out = new BufferedWriter(fstream);
-            out.write("add (msec), distribute (msec), fetch/iter (msec)\n");
-            out.write(String.format("%s, %s, %s\n", 
+            out.write("blocksize, clients, add (msec), distribute (msec), fetch/iter (msec)\n");
+            out.write(String.format("%s, %s, %s, %s, %s\n",
+                this.blockSize, this.numClients,
                 addWatch.elapsedMillis(), server.distWatch.elapsedMillis(), iterateWatch.elapsedMillis()));
             out.close();
         } catch (IOException e) {

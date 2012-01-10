@@ -1,8 +1,6 @@
 package de.uzl.mobverdb.sort.remote;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.rmi.server.RemoteObject;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,7 +17,6 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.Lists;
 
 import de.uzl.mobverdb.sort.remote.interfaces.ISortClient;
-import de.uzl.mobverdb.sort.remote.interfaces.ISortServer;
 
 public class Client extends UnicastRemoteObject implements ISortClient {
     

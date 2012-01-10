@@ -1,7 +1,5 @@
 package de.uzl.mobverdb.sort;
 
-import static org.junit.Assert.assertTrue;
-
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -10,10 +8,6 @@ import java.rmi.registry.Registry;
 import java.util.Random;
 
 import org.junit.Test;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Ordering;
 
 import de.uzl.mobverdb.sort.remote.Client;
 import de.uzl.mobverdb.sort.remote.interfaces.ISortServer;

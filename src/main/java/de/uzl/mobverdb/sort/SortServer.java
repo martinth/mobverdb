@@ -89,9 +89,9 @@ public class SortServer extends Thread {
                 e.printStackTrace();
             }
         }
-        System.out.println(String.format("Perf: %s; %s; %s", 
+        log.info(String.format("Perf: %s; %s; %s", 
             addWatch.elapsedMillis(), server.distWatch.elapsedMillis(), iterateWatch.elapsedMillis()));
-        
+       
         System.exit(0);
     }
 }

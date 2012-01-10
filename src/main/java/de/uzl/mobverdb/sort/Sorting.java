@@ -2,9 +2,7 @@ package de.uzl.mobverdb.sort;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -16,7 +14,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 
-import de.uzl.mobverdb.sort.remote.interfaces.ISortServer;
 import de.uzl.utils.Files;
 
 public class Sorting {

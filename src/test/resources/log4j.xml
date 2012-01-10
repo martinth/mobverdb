@@ -10,19 +10,15 @@
   </appender> 
   
   <appender name="file" class="org.apache.log4j.FileAppender"> 
-    <param name="file" value="server.log"/> 
+    <param name="file" value="server.log"/>
+    <param name="ImmediateFlush" value="true"/> 
     <layout class="org.apache.log4j.PatternLayout"> 
       <param name="ConversionPattern" value="%-5p %c{1} - %m%n"/> 
     </layout> 
   </appender> 
   
-  <logger name="de.uzl.mobverdb.sort.SortServer">
-  	<level value ="info" /> 
-    <appender-ref ref="file" /> 
-  </logger>
-
   <root> 
-    <priority value ="debug" /> 
+    <priority value ="warn" /> 
     <appender-ref ref="console" /> 
   </root>
 

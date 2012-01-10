@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
+import com.google.common.base.Stopwatch;
 
 import de.uzl.mobverdb.sort.remote.BaseSort;
 import de.uzl.mobverdb.sort.remote.DistributionSort;
@@ -23,6 +25,9 @@ public class SortServer extends Thread {
     private BaseSort server;
     private String inputData;
     private int numClients;
+    
+    private Stopwatch addWatch = new Stopwatch();
+    private Stopwatch iterateWatch = new Stopwatch();
 
     public SortServer(int numClients, boolean useDistSort, String inputData) throws IOException {
         this.server = useDistSort ? new DistributionSort() : new MergeSort();
@@ -41,22 +46,42 @@ public class SortServer extends Thread {
         
         log.debug("Reading inputfile");
         
+        addWatch.start();
         for (String string : Splitter.on(CharMatcher.INVISIBLE).split(inputData)) {
             server.add(string);
         }
+        addWatch.stop();
         log.info("Input file completely read");
         
         boolean isFinished = false;
+        int lastCount = -1;
         while(!isFinished) {
             try {
                 Thread.sleep(1000);
-                log.debug(String.format("%d clients connected. Waiting", server.getClientCount()));
-                if(server.getClientCount() >= numClients) {
-                    log.info(String.format("%d clients connected. Strating sort", server.getClientCount()));
+                int currentCount = server.getClientCount();
+                
+                if(currentCount != lastCount) {
+                    log.debug(String.format("%d clients connected. Waiting", currentCount));
+                    lastCount = currentCount;
+                }
+                if(currentCount >= numClients) {
+                    log.info("Starting sort");
                     server.sort();
                     log.info("Sorting finished");
+                    
+                    log.info("Starting to get results");
+                    iterateWatch.start();
+                    Iterator<String> iter = server.iterator();
+                    while(iter.hasNext()) {
+                        iter.next();
+                    }
+                    iterateWatch.stop();
+                    log.info("All results fetched");
+                    
                     isFinished = true;
                 }
+                
+                
             } catch (RemoteException e) {
                 log.fatal("Error while sorting:", e);
                 System.exit(1);
@@ -64,5 +89,9 @@ public class SortServer extends Thread {
                 e.printStackTrace();
             }
         }
+        System.out.println(String.format("Perf: %s; %s; %s", 
+            addWatch.elapsedMillis(), server.distWatch.elapsedMillis(), iterateWatch.elapsedMillis()));
+        
+        System.exit(0);
     }
 }

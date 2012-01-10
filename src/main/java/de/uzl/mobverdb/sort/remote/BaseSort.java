@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 
 import de.uzl.mobverdb.sort.remote.interfaces.ISortClient;
 import de.uzl.mobverdb.sort.remote.interfaces.ISortServer;
@@ -28,6 +29,8 @@ public abstract class BaseSort extends UnicastRemoteObject implements ISortServe
     protected List<String> toBeSorted = new ArrayList<String>();
     /** if we are currently sorting */
     protected AtomicBoolean currentlySorting = new AtomicBoolean();
+    
+    public final Stopwatch distWatch = new Stopwatch();
 
     public boolean registerClient(ISortClient client) throws RemoteException {
     	if(currentlySorting.get()) {
@@ -40,6 +43,7 @@ public abstract class BaseSort extends UnicastRemoteObject implements ISortServe
 
     public void add(String element) {
     	Preconditions.checkState(!currentlySorting.get(), "You cannot add elements after calling sort()");
+    	
     	this.toBeSorted.add(element);
     }
     
@@ -51,7 +55,9 @@ public abstract class BaseSort extends UnicastRemoteObject implements ISortServe
 
         currentlySorting.set(true);
         
+        distWatch.start();
         this.distributeWork();
+        distWatch.stop();
     }
     
     @Override

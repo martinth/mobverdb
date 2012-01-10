@@ -59,7 +59,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>de.uzl.mobverdb.sort.Sorter</mainClass>
+                        <mainClass>de.uzl.mobverdb.sort.Sorting</mainClass>
                     </manifest>
                 </archive>
                 <descriptorRefs>

@@ -1,7 +1,9 @@
-package de.uzl.mobverdb.sort;
+package de.uzl.mobverdb.sort.remote;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.rmi.server.RemoteObject;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,12 +18,18 @@ import org.apache.log4j.Logger;
 
 import com.google.common.collect.Lists;
 
-import de.uzl.mobverdb.sort.base.ISortClient;
+import de.uzl.mobverdb.sort.remote.interfaces.ISortClient;
+import de.uzl.mobverdb.sort.remote.interfaces.ISortServer;
 
-public class SortClient implements ISortClient, Serializable {
+public class Client extends UnicastRemoteObject implements ISortClient {
     
+    public Client() throws RemoteException {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
     private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
-	
+    
 	/** generated */
     private static final long serialVersionUID = -4469350325989245038L;
     
@@ -29,8 +37,8 @@ public class SortClient implements ISortClient, Serializable {
 	private Iterator<String> iter;
 	
     private FutureTask<Iterator<String>> sorterTask;
-    ExecutorService executor = Executors.newFixedThreadPool(1);
-    
+    private ExecutorService executor = Executors.newFixedThreadPool(1);
+
 
 	/**
 	 * {@inheritDoc}

@@ -1,4 +1,4 @@
-package de.uzl.mobverdb.sort.base;
+package de.uzl.mobverdb.sort.remote.interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -10,8 +10,8 @@ import java.util.Iterator;
  * @author Martin Thurau
  *
  */
-public interface ISortServer extends Remote, Iterable<String>  {
-	
+public interface ISortServer extends Remote  {
+    
 	/**
 	 * Register a new sort client. Clients can only register successfully if sort()
 	 * has not been called.
@@ -25,7 +25,7 @@ public interface ISortServer extends Remote, Iterable<String>  {
 	 * Add a new item to the "to be sorted" data
 	 * @param element
 	 */
-	public abstract void add(String element);
+	public abstract void add(String element)  throws RemoteException;
 
 	/**
 	 * Initiates the sort operation
@@ -33,7 +33,7 @@ public interface ISortServer extends Remote, Iterable<String>  {
 	 */
 	public abstract void sort() throws RemoteException;
 	
-	public Iterator<String> iterator();
+	public Iterator<String> iterator() throws RemoteException;
 
 
 }

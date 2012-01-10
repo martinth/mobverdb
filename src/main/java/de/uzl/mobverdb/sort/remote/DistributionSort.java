@@ -1,4 +1,4 @@
-package de.uzl.mobverdb.sort;
+package de.uzl.mobverdb.sort.remote;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -10,15 +10,19 @@ import java.util.NoSuchElementException;
 
 import com.google.common.base.Preconditions;
 
-import de.uzl.mobverdb.sort.base.BaseSortServer;
 
 /**
  * Implements a distributes merge sort.
  * @author Martin Thurau
  *
  */
-public class DistributionSortServer extends BaseSortServer  {
+public class DistributionSort extends BaseSort  {
         
+    public DistributionSort() throws RemoteException {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
     /** generated */
     private static final long serialVersionUID = 3753586170293486054L;
 

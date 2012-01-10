@@ -1,7 +1,8 @@
-package de.uzl.mobverdb.sort.base;
+package de.uzl.mobverdb.sort.remote;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,21 +10,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.base.Preconditions;
 
-public abstract class BaseSortServer implements ISortServer, Serializable {
+import de.uzl.mobverdb.sort.remote.interfaces.ISortClient;
+import de.uzl.mobverdb.sort.remote.interfaces.ISortServer;
+
+public abstract class BaseSort extends UnicastRemoteObject implements ISortServer {
+    
+    protected BaseSort() throws RemoteException {
+        super();
+        // TODO Auto-generated constructor stub
+    }
 
     /** generated */
     private static final long serialVersionUID = 1217951040030975793L;
     /** all clients that have registered themselves */
-    protected List<CachingSortClientWrapper> registeredClients;
+    protected List<CachingSortClientWrapper> registeredClients = new ArrayList<CachingSortClientWrapper>();
     /** data that will get sorted */
-    protected List<String> toBeSorted;
+    protected List<String> toBeSorted = new ArrayList<String>();
     /** if we are currently sorting */
     protected AtomicBoolean currentlySorting = new AtomicBoolean();
-
-    public BaseSortServer() {
-        this.registeredClients = new ArrayList<CachingSortClientWrapper>();
-        this.toBeSorted = new ArrayList<String>();
-    }
 
     public boolean registerClient(ISortClient client) throws RemoteException {
     	if(currentlySorting.get()) {
@@ -56,10 +60,13 @@ public abstract class BaseSortServer implements ISortServer, Serializable {
         return this.getIterator();
     }
     
+    public int getClientCount() {
+        return this.registeredClients.size();
+    }
+    
+    
     protected abstract void distributeWork() throws RemoteException;
 
     protected abstract Iterator<String> getIterator();
-
-
 
 }

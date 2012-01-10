@@ -1,6 +1,7 @@
-package de.uzl.mobverdb.sort;
+package de.uzl.mobverdb.sort.remote;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -8,16 +9,19 @@ import com.google.common.base.Preconditions;
 
 import com.google.common.collect.Iterables;
 
-import de.uzl.mobverdb.sort.base.BaseSortServer;
-import de.uzl.mobverdb.sort.base.CachingSortClientWrapper;
 
 /**
  * Implements a distributes merge sort.
  * @author Martin Thurau
  *
  */
-public class MergeSortServer extends BaseSortServer  {
+public class MergeSort extends BaseSort  {
     
+    public MergeSort() throws RemoteException {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
     /** generated */
     private static final long serialVersionUID = 3753586170293486054L;
 
@@ -26,8 +30,9 @@ public class MergeSortServer extends BaseSortServer  {
 		int sliceSize = (int) Math.ceil(((float)this.toBeSorted.size()) / this.registeredClients.size());
 		Iterator<CachingSortClientWrapper> clientsToBeUsed = this.registeredClients.iterator();
 		for(List<String> subList : Iterables.partition(this.toBeSorted, sliceSize)) {
+		    ArrayList<String> list = new ArrayList<String>(subList);
 			CachingSortClientWrapper client = clientsToBeUsed.next();
-			client.putWork(subList); //FIXME ich bin mir noch nicht schlüssig was wir im Fehlerfall machen
+			client.putWork(list); //FIXME ich bin mir noch nicht schlüssig was wir im Fehlerfall machen
 		}
 	}
 

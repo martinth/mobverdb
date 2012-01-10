@@ -1,4 +1,4 @@
-package de.uzl.mobverdb.sort.base;
+package de.uzl.mobverdb.sort.remote;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.Queue;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+
+import de.uzl.mobverdb.sort.remote.interfaces.ISortClient;
 
 /**
  * A Wrapper class for {@link ISortClient} that hides a blocked fetch below a simple 

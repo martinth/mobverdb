@@ -1,5 +1,7 @@
 package de.uzl.mobverdb.sort;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,7 +13,6 @@ import org.apache.log4j.Logger;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
-
 import de.uzl.mobverdb.sort.remote.BaseSort;
 import de.uzl.mobverdb.sort.remote.DistributionSort;
 import de.uzl.mobverdb.sort.remote.MergeSort;
@@ -20,6 +21,7 @@ public class SortServer extends Thread {
     
     private final static Logger log = Logger.getLogger(Sorting.class.getCanonicalName());
     public final static String SERVER_NAME = "sortServer";
+    private final static String PERF_FILE = "perf.log";
 
     
     private BaseSort server;
@@ -29,8 +31,8 @@ public class SortServer extends Thread {
     private Stopwatch addWatch = new Stopwatch();
     private Stopwatch iterateWatch = new Stopwatch();
 
-    public SortServer(int numClients, boolean useDistSort, String inputData) throws IOException {
-        this.server = useDistSort ? new DistributionSort() : new MergeSort();
+    public SortServer(int numClients, boolean useDistSort, String inputData, int blockSize) throws IOException {
+        this.server = useDistSort ? new DistributionSort(blockSize) : new MergeSort(blockSize);
         this.inputData = inputData;
         this.numClients = numClients;
         
@@ -44,14 +46,13 @@ public class SortServer extends Thread {
     
     public void run() {
         
-        log.debug("Reading inputfile");
         
         addWatch.start();
         for (String string : Splitter.on(CharMatcher.INVISIBLE).split(inputData)) {
             server.add(string);
         }
         addWatch.stop();
-        log.info("Input file completely read");
+        log.debug("Input file completely read");
         
         boolean isFinished = false;
         int lastCount = -1;
@@ -65,18 +66,16 @@ public class SortServer extends Thread {
                     lastCount = currentCount;
                 }
                 if(currentCount >= numClients) {
-                    log.info("Starting sort");
                     server.sort();
-                    log.info("Sorting finished");
+                    log.debug("Sorting finished");
                     
-                    log.info("Starting to get results");
                     iterateWatch.start();
                     Iterator<String> iter = server.iterator();
                     while(iter.hasNext()) {
                         iter.next();
                     }
                     iterateWatch.stop();
-                    log.info("All results fetched");
+                    log.debug("All results fetched");
                     
                     isFinished = true;
                 }
@@ -89,8 +88,18 @@ public class SortServer extends Thread {
                 e.printStackTrace();
             }
         }
-        log.info(String.format("Perf: %s; %s; %s", 
-            addWatch.elapsedMillis(), server.distWatch.elapsedMillis(), iterateWatch.elapsedMillis()));
+        
+        try {
+            FileWriter fstream = new FileWriter(PERF_FILE);
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write("add (msec), distribute (msec), fetch/iter (msec)\n");
+            out.write(String.format("%s, %s, %s\n", 
+                addWatch.elapsedMillis(), server.distWatch.elapsedMillis(), iterateWatch.elapsedMillis()));
+            out.close();
+        } catch (IOException e) {
+            log.error("Could not write performance file", e);
+        }
+       
        
         System.exit(0);
     }

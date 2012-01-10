@@ -31,6 +31,7 @@ public class Sorting {
         OptionGroup serverType = new OptionGroup();
         serverType.addOption(new Option("d", "distsort", false, "Use distributionsort (otherwise mergesort is used)"));
         options.addOptionGroup(serverType);
+        options.addOption(new Option("b", "blocksize", true, "Blocksize for data fetching from client (default: 10)"));
         CommandLineParser parser = new PosixParser();
         
         try {
@@ -54,7 +55,13 @@ public class Sorting {
                         throw new ParseException("You must give a input file as paramter");
                     }
                     int numClients = Integer.parseInt(cmd.getOptionValue('s'));
-                    serverMode(numClients, cmd.hasOption('d'), cmd.getArgs()[0]);
+                    
+                    int blockSize = 10;
+                    if(cmd.hasOption('b')) {
+                        blockSize = Integer.parseInt(cmd.getOptionValue('b'));
+                    }
+                    
+                    serverMode(numClients, cmd.hasOption('d'), cmd.getArgs()[0], blockSize);
                 } else if (cmd.hasOption('c')) {
                     clientMode("//"+cmd.getOptionValue("c")+"/"+SortServer.SERVER_NAME);
                 } else {
@@ -70,14 +77,14 @@ public class Sorting {
             }
     }
     
-    private static void serverMode(int numClients, boolean distSort, String inputFile) {
+    private static void serverMode(int numClients, boolean distSort, String inputFile, int blockSize) {
         
         
         
 
         try {
             String inputData = Files.readFile(inputFile);
-            SortServer s = new SortServer(numClients, distSort, inputData);
+            SortServer s = new SortServer(numClients, distSort, inputData, blockSize);
             s.start();
         } catch (IOException e) {
             log.fatal(String.format("Input file '%s' not found.", inputFile));

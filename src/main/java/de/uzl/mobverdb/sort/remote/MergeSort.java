@@ -18,8 +18,11 @@ import com.google.common.collect.Iterables;
 public class MergeSort extends BaseSort  {
     
     public MergeSort() throws RemoteException {
-        super();
-        // TODO Auto-generated constructor stub
+        this(10);
+    }
+    
+    public MergeSort(int blockSize) throws RemoteException {
+        super(blockSize);
     }
 
     /** generated */

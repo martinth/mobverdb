@@ -26,19 +26,15 @@ private Client client;
 
     
     public void run() {
-        
-        
-        
         try {
-            
             server.registerClient(client);
             log.info("Client registered at server");
             
             while(!client.isFinished()) {
                 Thread.sleep(1000);
             }
-            log.debug("Client is finished. Waiting 5 secs...");
-            Thread.sleep(5000);
+            log.debug("Client is finished. Waiting 3 secs...");
+            Thread.sleep(3000);
             log.info("Client shutting down");
             System.exit(0);
         } catch (InterruptedException e) {

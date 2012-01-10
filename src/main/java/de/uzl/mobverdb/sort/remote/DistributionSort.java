@@ -17,10 +17,13 @@ import com.google.common.base.Preconditions;
  *
  */
 public class DistributionSort extends BaseSort  {
-        
+    
     public DistributionSort() throws RemoteException {
-        super();
-        // TODO Auto-generated constructor stub
+        this(10);
+    }
+        
+    public DistributionSort(int blockSize) throws RemoteException {
+        super(blockSize);
     }
 
     /** generated */

@@ -89,7 +89,7 @@ public class Client extends UnicastRemoteObject implements ISortClient {
 	
 	public boolean isFinished() {
 	    try {
-            return sorterTask != null && sorterTask.isDone() && sorterTask.get().hasNext();
+            return sorterTask != null && sorterTask.isDone() && !sorterTask.get().hasNext();
         } catch (InterruptedException e) {
             return true;
         } catch (ExecutionException e) {

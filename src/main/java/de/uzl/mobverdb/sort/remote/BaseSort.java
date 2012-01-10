@@ -15,9 +15,12 @@ import de.uzl.mobverdb.sort.remote.interfaces.ISortServer;
 
 public abstract class BaseSort extends UnicastRemoteObject implements ISortServer {
     
-    protected BaseSort() throws RemoteException {
+    /** size of slices that will be fetched from the client one at a time */
+    private int blockSize;
+
+    protected BaseSort(int blockSize) throws RemoteException {
         super();
-        // TODO Auto-generated constructor stub
+        this.blockSize = blockSize;
     }
 
     /** generated */
@@ -35,7 +38,7 @@ public abstract class BaseSort extends UnicastRemoteObject implements ISortServe
     	if(currentlySorting.get()) {
     		return false;
     	} else {
-    		this.registeredClients.add(new CachingSortClientWrapper(client, 10));
+    		this.registeredClients.add(new CachingSortClientWrapper(client, this.blockSize));
     		return true;
     	} 
     }

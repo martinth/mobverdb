@@ -53,6 +53,21 @@
   			<artifactId>maven-surefire-plugin</artifactId>
   			<version>2.10</version>
   		</plugin>
+
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>de.uzl.mobverdb.sort.Sorter</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+        </plugin>
+
   	</plugins>
   </build>
 </project>

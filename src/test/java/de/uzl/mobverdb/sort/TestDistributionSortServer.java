@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 public class TestDistributionSortServer extends TestSortServer {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        reg = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+        if(reg == null) reg = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
         Naming.rebind("server", new DistributionSortServer());
     }
 }

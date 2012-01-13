@@ -1,0 +1,87 @@
+%%% Dokumentenklasse und Layout 
+\documentclass[fontsize=12pt,a4paper,headinclude=no,headings=small]{scrartcl}
+
+%%% Ränder
+%\usepackage{typearea}
+\areaset{180mm}{230mm} % Der gewünschte Satzspiegel
+
+%%% Sprache, Rechtschreibung, Silbentrennung
+\usepackage[ngerman]{babel} 	% Deutscher Text
+\usepackage[T1]{fontenc}			% Trennung von Umlauten enthaltenden Woertern
+\usepackage[utf8x]{inputenc} 	% Erlaubt Eingabe von Umlauten (kein "a etc. notwendig). 
+\usepackage[right]{eurosym}		% Euro-Symbol verwendbar (durch \euro)
+
+%%% Darstellung, Formatierung
+\addtokomafont{sectioning}{\rmfamily} 	% Serifen in Überschrift
+\clubpenalty = 1000 			% reduziert Schusterjungen
+\widowpenalty = 1000 			% reduziert Hurenkinder
+%\usepackage{ae,aecompl}			% schönere Schriftart (Vektorfonts)
+
+%%% Links für pdflatex
+\usepackage{hyperref}	% PDF Referenzen klickbar
+\usepackage{url}		% URLs klickbar
+
+%%% Tabellen und Grafiken, Listen
+\usepackage{graphicx}	% Grafiken einbinden
+\usepackage{pdfpages}		% PDFs einbinden
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{dcolumn}
+\usepackage{multicol}
+%\setlength{\columnseprule}{1pt}
+%\setlength{\columnsep}{10pt}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{R}{>{\arraybackslash}X}
+%\usepackage[skip=0pt,labelfont=it,nooneline,hang,small]{caption}
+\usepackage{enumerate}
+
+%%% Punkt + Komma Abstände bei Tausendern/Dezimalzahlen ans dt. anpassen
+%\mathcode`,="013B
+%\mathcode`.="613A
+
+%%% Farben (Farben siehe: http://en.wikibooks.org/wiki/LaTeX/Colors)
+\usepackage{color}
+
+%%% TikZ
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+
+%%% Mathe
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm} % Umgebung für Beweise und Theoreme
+%\usepackage{amsfonts}
+\allowdisplaybreaks % Alignment Umgebung darf auf mehrere Seiten umbrechen
+\usepackage{dsfont}
+
+%%% Header
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\headheight}{30pt}
+\lhead{Hausaufgabe zur Vorlesung \\\emph{Mobile und verteilte Datenbanken}}
+\rhead{Dennis Krüger ()\\Martin Thurau (612016)}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\chead{}
+
+%%% eigene Befehle
+% TODO und FIXME
+  \newcommand{\todo}[1]{\colorbox{yellow}{\textbf{TODO} #1}}
+  \newcommand{\fixme}[1]{\colorbox{red}{\textbf{FIXME} #1}}
+% Sequenz
+  \newcommand{\seq}[1]{\ensuremath{\left \langle #1 \right \rangle }}
+% Mengen (mit und ohne "`für die gilt"' Bedingung
+  \newcommand{\set}[1]{\ensuremath{\left\lbrace {#1} \right\rbrace }}
+  \newcommand{\condset}[2]{\ensuremath{\left\lbrace #1 \;\middle|\; #2 \right\rbrace }}
+
+%%% Mathe Operatorentype filter text
+\renewcommand{\div}{\ensuremath{\text{ div }}}
+\renewcommand{\mod}{\ensuremath{\text{ mod }}}
+\DeclareMathOperator{\ef}{emptyfile}
+\DeclareMathOperator{\es}{empty}
+
+\begin{document}
+asdasd
+\end{document}
+

@@ -1,0 +1,2 @@
+sorttype, blocksize, clients, add (msec), distribute (msec), fetch/iter (msec), total (msec)
+MERGE, 1000, 8, 112, 619, 1854, 3924

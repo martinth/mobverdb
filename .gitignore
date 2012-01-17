@@ -1,2 +1,5 @@
 target
-*perf*.log
+doc/analyse.aux
+doc/analyse.log
+doc/analyse.out
+

@@ -1,0 +1,2 @@
+sorttype, blocksize, clients, add (msec), distribute (msec), fetch/iter (msec), total (msec)
+DIST, 100, 8, 117, 451, 1676, 4658

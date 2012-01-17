@@ -66,6 +66,7 @@
 \chead{}
 
 %%% eigene Befehle
+\newcommand{\footurl}[1]{\footnote{\url{#1}}}
 % TODO und FIXME
   \newcommand{\todo}[1]{\colorbox{yellow}{\textbf{TODO} #1}}
   \newcommand{\fixme}[1]{\colorbox{red}{\textbf{FIXME} #1}}
@@ -82,6 +83,16 @@
 \DeclareMathOperator{\es}{empty}
 
 \begin{document}
-asdasd
+\section{Testreihen}
+\subsection{Umgebung}
+Um das verteilte Sortieren sinnvoll Testen zu könne, ist es notwendig die Ausführung auf mehrere Rechner zu verteilen. Eine rein lokale Ausführung würde zum einen keinen realistischen Kommunikationoverhead bedeuten, zum anderen wäre die Ausführung an die Leistungsfähigkeit der lokalen CPU gebunden.
+
+Die Messreihen wurden daher auf virtuellen Maschinen in der Amazon Elastic Compute Cloud (Amazon EC2)\footurl{http://aws.amazon.com/ec2/} ausgeführt. Die Ausführung erfolgte dabei jeweils für Server und jeden Client getrennt auf einer eigenen "`Micro"' Instanz. Zur Durchführung der Testreihen wurde mit Hilfe von Python, Fabric\footurl{http://fabfile.org} und boto\footurl{http://code.google.com/p/boto/} automatisiert und ausgeführt.
+
+\subsection{Durchführung der Messung}
+Die Performancemessung wird ausschließlich auf dem Server durchgeführt. Der Server misst dabei, wie viele Millisekunden er für das einlesen der zu sortierenden Daten, zum verteilen der Daten an die Clients sowie zum Interieren über die Sortierten Ergebnisse benötigt. Außerdem wird noch die gesamte Ausführugnszeit gemessen. Da es sich bei der Umgebung, in der das Sortieren durchgeführt wird, um virtuelle Maschinen handelt, ist die Ausführungszeit natürlich abhängig von der Auslastung der physikalischen Hosts. Es ist jedoch davon auszugehen, dass aufgrund der Tatsache, das Amazon die Instanzen über viele Rechner verteilt, ein brauchbarer Mittelwert entsteht.
+
+\subsection{Parameter der Messungen}
+Die Messreihen wurden jeweils mit 2, 4, 8 und 16 Sortierclients und einem Server durchgeführt. Dabei wurden jeweils die Blockgrößen 10, 100, 1000 und 10000 getestet. Für die lokale Sortierung gelten diese Parameter natürlich nicht, hierbei wurde nur die Sortierung mittels \texttt{Colletions.sort()} ausgeführt. Als Daten die sortiert werden sollen wurden Goethes Faust I und II ausgewählt, die dem Projekt Gutenberg als Textdatei entnommen wurden. Die Testdatei hat dabei eine Dateigröße von 556 Kilobyte und wird vom Server vor der Verteilung an jedem Whitespace aufgetrennt. Dabei entstehen 81333 einzelne Strings, die dann Sortiert wurden.
 \end{document}
 

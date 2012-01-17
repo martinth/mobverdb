@@ -37,7 +37,7 @@ def test_distsort(clients, sizes):
         fab test_mergesort:"1","10 100"
         
         will execute a test with one client and blocksizes 10 and 100'''
-    _run_test('m', clients, sizes)
+    _run_test('d', clients, sizes)
     
 def test_localsort():
     '''Test the performance of local sorting.'''
@@ -62,13 +62,19 @@ def _run_test(mode, clients, sizes):
         execute(start_clients)
         # get log and store it locally
         execute(fetch_perflog, mode, client_count, blocksize)
-        
+  
+def _kill_java():
+    with settings(warn_only=True):
+        # kill client if running
+        run('pgrep java && kill $(pgrep java); sleep 1')
 
 @roles('client')
 @parallel
 def start_clients():
     '''start client (parallel) and let them connect to server'''
     cmd = ('java -jar', JAR, '-c', env.roledefs['server'][0])
+    
+    _kill_java()
     run(' '.join(map(str, cmd)))
 
 @roles('server')
@@ -78,7 +84,12 @@ def start_server(mode, blocksize=10, bg=True):
         cmd = ['dtach -n /tmp/sorting -Ez']
     else:
         cmd = []
-    cmd += ['java -jar', JAR, '-s', len(env.roledefs['client']), '-'+mode, '-b', blocksize, FILE]
+    if mode is 'd':
+        cmd += ['java -jar', JAR, '-s', len(env.roledefs['client']), '-d', '-b', blocksize, FILE]
+    else:
+        cmd += ['java -jar', JAR, '-s', len(env.roledefs['client']), '-b', blocksize, FILE]
+    
+    _kill_java()
     run(' '.join(map(str, cmd)))        
 
 @roles('server')
@@ -151,14 +162,13 @@ def create_ec2(num):
         execute(copy_files)
         
     return res.instances
-  
-@parallel 
+   
 def copy_files():
     '''copy jar and data file onto hosts (parallel)'''
     put('target/'+JAR, JAR)
     put(FILE, FILE)  
 
-@parallel 
+@parallel(pool_size=3) 
 def install_environment():
     '''install the needed software on the hosts'''
     run('aptitude -q -y update > /dev/null')

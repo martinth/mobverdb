@@ -20,6 +20,8 @@ public class Sorting {
     
     private final static Logger log = Logger.getLogger(Sorting.class.getCanonicalName());
     
+    public static enum Sorttype { MERGE, DIST, LOCAL };
+    
 
     public static void main(String[] args) {
         Options options = new Options();
@@ -30,6 +32,7 @@ public class Sorting {
         
         OptionGroup serverType = new OptionGroup();
         serverType.addOption(new Option("d", "distsort", false, "Use distributionsort (otherwise mergesort is used)"));
+        serverType.addOption(new Option("l", "localsort", false, "Use a local sorting (otherwise mergesort is used)"));
         options.addOptionGroup(serverType);
         options.addOption(new Option("b", "blocksize", true, "Blocksize for data fetching from client (default: 10)"));
         CommandLineParser parser = new PosixParser();
@@ -38,7 +41,7 @@ public class Sorting {
             setupAndRun(parser.parse(options, args));
         } catch (ParseException e) {
             HelpFormatter formatter = new HelpFormatter();
-            System.out.println(e.getMessage());
+            System.out.println(e.getMessage()+"\n");
             formatter.printHelp("sorting.jar <input file>", options);
         }
     }
@@ -60,8 +63,11 @@ public class Sorting {
                     if(cmd.hasOption('b')) {
                         blockSize = Integer.parseInt(cmd.getOptionValue('b'));
                     }
+                    Sorttype type = Sorttype.MERGE;
+                    if(cmd.hasOption('d')) type = Sorttype.DIST;
+                    if(cmd.hasOption('l')) type = Sorttype.LOCAL;
                     
-                    serverMode(numClients, cmd.hasOption('d'), cmd.getArgs()[0], blockSize);
+                    serverMode(numClients, type, cmd.getArgs()[0], blockSize);
                 } else if (cmd.hasOption('c')) {
                     clientMode("//"+cmd.getOptionValue("c")+"/"+SortServer.SERVER_NAME);
                 } else {
@@ -77,22 +83,14 @@ public class Sorting {
             }
     }
     
-    private static void serverMode(int numClients, boolean distSort, String inputFile, int blockSize) {
-        
-        
-        
-
+    private static void serverMode(int numClients, Sorttype sortType, String inputFile, int blockSize) {
         try {
             String inputData = Files.readFile(inputFile);
-            SortServer s = new SortServer(numClients, distSort, inputData, blockSize);
+            SortServer s = new SortServer(numClients, sortType, inputData, blockSize);
             s.start();
         } catch (IOException e) {
             log.fatal(String.format("Input file '%s' not found.", inputFile));
-        }
-        
-        
-        
-        
+        } 
     }
     
     private static void clientMode(String url) throws MalformedURLException, NotBoundException {
@@ -102,10 +100,6 @@ public class Sorting {
         } catch (RemoteException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
-        
+        } 
     }
-    
-    
-
 }

@@ -10,20 +10,45 @@ KEY_NAME = 'ec2-mobverdb-ssh'
 SECURITY_GROUPS = ('mobverdb',)
 
 JAR = 'sorting-runnable.jar'
-FILE = 'alice.txt'
+FILE = 'faust.txt'
 
 env.user = 'root'
 env.key_filename = os.path.expanduser('~/'+KEY_NAME+'.pem')
 
-def run_test(clients, sizes):
-    '''Test the performance. Parameter 'clients' and 'sizes' are expected to be strings
-    that contain space separted integers (since fabric doesn't allow list-arguments).
-    For each combination of size and client a testrun will be done.
+def test_mergesort(clients, sizes):
+    '''Test the performance of mergesort.
+    Parameter 'clients' and 'sizes' are expected to be strings
+    that contain space separated integers (since fabric doesn't allow list-arguments).
+    For each combination of size and client a test run will be done.
     
     Example:
-        fab run_test:"1","10 100"
+        fab test_mergesort:"1","10 100"
         
         will execute a test with one client and blocksizes 10 and 100'''
+    _run_test('m', clients, sizes)
+    
+def test_distsort(clients, sizes):
+    '''Test the performance of distribution sort.
+    Parameter 'clients' and 'sizes' are expected to be strings
+    that contain space separated integers (since fabric doesn't allow list-arguments).
+    For each combination of size and client a test run will be done.
+    
+    Example:
+        fab test_mergesort:"1","10 100"
+        
+        will execute a test with one client and blocksizes 10 and 100'''
+    _run_test('m', clients, sizes)
+    
+def test_localsort():
+    '''Test the performance of local sorting.'''
+    # request as many instances as needed (+1 is one for the server)        
+    request(1)
+    # start server
+    execute(start_server, 'l', 0, False)
+    # get log and store it locally
+    execute(fetch_perflog, 'l', 0, 0)
+
+def _run_test(mode, clients, sizes):
     
     for cc, bs in product(clients.split(' '), sizes.split(' ')):
         client_count = int(cc)
@@ -31,13 +56,12 @@ def run_test(clients, sizes):
 
         # request as many instances as needed (+1 is one for the server)        
         request(client_count+1)
-        
         # start server
-        execute(start_server, blocksize)
+        execute(start_server, mode, blocksize)
         # start clients. this will wait until all clients terminate
         execute(start_clients)
         # get log and store it locally
-        execute(fetch_perflog, client_count, blocksize)
+        execute(fetch_perflog, mode, client_count, blocksize)
         
 
 @roles('client')
@@ -48,16 +72,20 @@ def start_clients():
     run(' '.join(map(str, cmd)))
 
 @roles('server')
-def start_server(blocksize=10):
+def start_server(mode, blocksize=10, bg=True):
     '''start serverprocess (in background via dtach)'''
-    cmd = ('dtach -n /tmp/sorting -Ez', 'java -jar', JAR, '-s', len(env.roledefs['client']), '-b', blocksize, FILE)
+    if bg:
+        cmd = ['dtach -n /tmp/sorting -Ez']
+    else:
+        cmd = []
+    cmd += ['java -jar', JAR, '-s', len(env.roledefs['client']), '-'+mode, '-b', blocksize, FILE]
     run(' '.join(map(str, cmd)))        
 
 @roles('server')
-def fetch_perflog(client_count, blocksize):
+def fetch_perflog(prefix, client_count, blocksize):
     '''fetch der perf.log file from the server and store it locally
     (renamed be clientcount and blocksize)'''
-    get('perf.log', 'perf_%s_%s.log'%(client_count, blocksize))
+    get('perf.log', '%s_perf_%s_%s.log'%(prefix, client_count, blocksize))
 
 
     
@@ -73,9 +101,12 @@ def request(num):
         for i in r.instances:
             if i.image_id == AMI:
                 if i.state == 'stopped':
-                    i.start()
-                    print "starting", i
-                    all.append(i)
+                    if len(all) < num:
+                        i.start()
+                        print "starting", i
+                        all.append(i)
+                    else:
+                        break
                 elif i.state == 'running':
                     all.append(i)
                     

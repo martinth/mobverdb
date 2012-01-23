@@ -14,7 +14,8 @@ import org.apache.log4j.Logger;
 
 import de.uzl.mobverdb.join.modes.LocalJoin;
 import de.uzl.mobverdb.join.modes.MeasurableJoin;
-import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeeded;
+import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeededClient;
+import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeededServer;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeClient;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeServer;
 
@@ -86,9 +87,9 @@ public class Joiner {
                 if(cmd.getArgList().size() == 1) {
                     String server = cmd.getOptionValue("connect-to");
                     if(server != null) {
-                        new FetchNeeded(new File(cmd.getArgs()[0]), server).join();
+                        new FetchNeededClient(new File(cmd.getArgs()[0]), server);
                     } else {
-                        FetchNeeded serverInstance = new FetchNeeded(new File(cmd.getArgs()[0]), null);
+                        FetchNeededServer serverInstance = new FetchNeededServer(new File(cmd.getArgs()[0]));
                         serverInstance.join();
                         measuredJoin = serverInstance;
                     }

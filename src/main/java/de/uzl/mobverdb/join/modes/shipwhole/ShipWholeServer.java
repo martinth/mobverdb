@@ -8,21 +8,21 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 
-import com.google.common.collect.Iterables;
-
+import de.uzl.mobverdb.join.JoinUtils;
 import de.uzl.mobverdb.join.data.Row;
+import de.uzl.mobverdb.join.modes.JoinPerf;
+import de.uzl.mobverdb.join.modes.MeasurableJoin;
 import de.uzl.utils.Threads;
 
-public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeServer {
+public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeServer, MeasurableJoin {
     
     private static final long serialVersionUID = -5430396965086442250L;
     private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
     private ArrayList<IShipWholeClient> clients = new ArrayList<IShipWholeClient>();
-    ArrayList<Row> output = new ArrayList<Row>();
+    Row[] output;
+    private JoinPerf joinPerf = new JoinPerf();
     public final static String BIND_NAME = "shipWholeServer"; 
     
     public ShipWholeServer() throws RemoteException {
@@ -39,20 +39,17 @@ public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeSe
             Threads.trySleep(1000);
         }
         log.info("Two clients connect, fetching their data");
+        this.joinPerf.totalTime.start();
         
         Row[] dataR = this.clients.get(0).getData();
         Row[] dataS = this.clients.get(1).getData();
+        this.joinPerf.rmiCalls(2);
         
         log.info("Data fetched, beginning to join");
+        this.joinPerf.joinTime.start();
+        this.output = JoinUtils.nestedLoopJoin(dataR, dataS);
+        this.joinPerf.stopAll();
         
-        
-        for (Row lineR : dataR) {
-            for(Row lineS : dataS) {
-                if(lineR.getKey().equals(lineS.getKey())) {
-                    output.add( new Row(lineR.getKey(), Iterables.concat(lineR.getData(), lineS.getData())) );
-                }
-            }
-        }
         log.info("Join completed");
         
         this.clients.clear();
@@ -62,16 +59,20 @@ public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeSe
             // we ignore this
         }
         UnicastRemoteObject.unexportObject(reg, true);
-        System.exit(0);
     }
     
-    public List<Row> getResults() {
+    public Row[] getResults() {
         return this.output;
     }
 
     @Override
     public void register(IShipWholeClient client) throws RemoteException {
         this.clients.add(client);
+    }
+
+    @Override
+    public JoinPerf getPerf() {
+        return this.joinPerf;
     }
     
 }

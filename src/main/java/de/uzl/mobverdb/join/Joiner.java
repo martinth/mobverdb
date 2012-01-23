@@ -13,6 +13,8 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 
 import de.uzl.mobverdb.join.modes.LocalJoin;
+import de.uzl.mobverdb.join.modes.MeasurableJoin;
+import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeeded;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeClient;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeServer;
 
@@ -29,7 +31,8 @@ public class Joiner {
         // option group for join type
         OptionGroup mode = new OptionGroup();
         mode.addOption(new Option("l", "local", false, "Do a local join"));
-        mode.addOption(new Option("w", "ship-whole", false, "Ship-whole join. The optional parameter lets this instance connect o the given host"));
+        mode.addOption(new Option("w", "ship-whole", false, "Ship-whole join"));
+        mode.addOption(new Option("f", "fetch-needed", false, "Fetch-as-needed join"));
         options.addOptionGroup(mode);
         
         options.addOption("c", "connect-to", true, "in client/server mode: where to connect to");
@@ -48,12 +51,15 @@ public class Joiner {
     private static void setupAndRun(CommandLine cmd) throws ParseException {
         
         try {
+            MeasurableJoin measuredJoin = null;
+            
             
             /* a local join */
             if(cmd.hasOption("local")) {
                 if(cmd.getArgList().size() == 2) {       
                         LocalJoin localJoin = new LocalJoin(new File(cmd.getArgs()[0]), new File(cmd.getArgs()[1]));
-                        localJoin.join();    
+                        localJoin.join();
+                        measuredJoin = localJoin;
                 } else {
                     throw new ParseException("local mode requires two parameters (<file A> and <file B>");
                 }
@@ -64,16 +70,39 @@ public class Joiner {
                 String server = cmd.getOptionValue("connect-to");
                 if(server != null) {
                     if(cmd.getArgList().size() == 1) {
-                        ShipWholeClient client = new ShipWholeClient(new File(cmd.getArgs()[0]), server);
-                        
+                        new ShipWholeClient(new File(cmd.getArgs()[0]), server);
                     } else {
                         throw new ParseException("ship whole mode requires one parameters (<file A>");
                     }
                 } else {
                     ShipWholeServer s = new ShipWholeServer();
                     s.serve();
+                    measuredJoin = s;
                 }
             }   
+            
+            /* fetch as needed join */
+            if(cmd.hasOption("fetch-needed")) {
+                if(cmd.getArgList().size() == 1) {
+                    String server = cmd.getOptionValue("connect-to");
+                    if(server != null) {
+                        new FetchNeeded(new File(cmd.getArgs()[0]), server).join();
+                    } else {
+                        FetchNeeded serverInstance = new FetchNeeded(new File(cmd.getArgs()[0]), null);
+                        serverInstance.join();
+                        measuredJoin = serverInstance;
+                    }
+                    
+                    
+                } else {
+                    throw new ParseException("ship whole mode requires one parameters (<file A>");
+                }
+            }   
+            
+            if(measuredJoin != null) {
+                System.out.println(measuredJoin.getPerf());
+                System.exit(0);
+            }
 
         } catch (Exception e) {
             log.fatal("Failed with Exception", e);

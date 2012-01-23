@@ -2,11 +2,8 @@ package de.uzl.mobverdb.join.modes;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import com.google.common.collect.Iterables;
-
-
+import de.uzl.mobverdb.join.JoinUtils;
 import de.uzl.mobverdb.join.data.CSVData;
 import de.uzl.mobverdb.join.data.Row;
 
@@ -16,30 +13,27 @@ import de.uzl.mobverdb.join.data.Row;
  * @author Martin Thurau
  *
  */
-public class LocalJoin extends AbstractJoin {
+public class LocalJoin implements MeasurableJoin {
     
     private CSVData dataA;
     private CSVData dataB;
+    private JoinPerf joinPerf = new JoinPerf();
     
     public LocalJoin(File fileA, File fileB) throws NumberFormatException, IOException {
         this.dataA = new CSVData(fileA);
         this.dataB = new CSVData(fileB);
     }
 
+    public Row[] join() {
+        joinPerf.startAll();
+        Row[] result = JoinUtils.nestedLoopJoin(this.dataA.lines, this.dataB.lines);
+        joinPerf.stopAll();
+        return result;
+    }
+
     @Override
-    protected Row[] doJoin() {
-        
-        ArrayList<Row> output = new ArrayList<Row>();
-        
-        for (Row lineA : this.dataA.lines) {
-            for(Row lineB : this.dataB.lines) {
-                if(lineA.getKey().equals(lineB.getKey())) {
-                    output.add( new Row(lineA.getKey(), Iterables.concat(lineA.getData(), lineB.getData())) );
-                }
-            }
-        }
-        
-        return output.toArray(new Row[] {});
+    public JoinPerf getPerf() {
+        return this.joinPerf;
     }
 
 }

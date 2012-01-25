@@ -16,7 +16,6 @@ import de.uzl.mobverdb.join.data.Row;
 public class FetchNeededClient extends UnicastRemoteObject implements IFetchNeededClient {
     
     private static final long serialVersionUID = 4712432535913345304L;
-    private static final String BIND_NAME = "fetchAsNeeded";
     private Multimap<Integer, Row> keyToData = HashMultimap.create();
     private IFetchNeededServer server;
     private CSVData data;
@@ -29,7 +28,7 @@ public class FetchNeededClient extends UnicastRemoteObject implements IFetchNeed
             this.keyToData.put(row.getKey(), row);
         }
         
-        server = (IFetchNeededServer) Naming.lookup("//"+otherHost+"/"+FetchNeededClient.BIND_NAME);
+        server = (IFetchNeededServer) Naming.lookup("//"+otherHost+"/"+FetchNeededServer.BIND_NAME);
         server.register(this);
     }
     

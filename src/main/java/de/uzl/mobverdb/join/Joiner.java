@@ -20,6 +20,7 @@ import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeededClient;
 import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeededServer;
 import de.uzl.mobverdb.join.modes.semi.SemiJoinClient;
 import de.uzl.mobverdb.join.modes.semi.SemiJoinServer;
+import de.uzl.mobverdb.join.modes.semi.parallel.ParallelSemiJoinServer;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeClient;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeServer;
 
@@ -39,6 +40,7 @@ public class Joiner {
         mode.addOption(new Option("w", "ship-whole", false, "Ship-whole join"));
         mode.addOption(new Option("f", "fetch-needed", false, "Fetch-as-needed join"));
         mode.addOption(new Option("s", "semi", false, "Semi join"));
+        mode.addOption(new Option("sp", "semi-parallel", false, "Parallel semi join"));
         mode.addOption(new Option("b", "bitvektor", false, "Bitvektor join"));
         options.addOptionGroup(mode);
         
@@ -115,6 +117,24 @@ public class Joiner {
                         new SemiJoinClient(new File(cmd.getArgs()[0]), server);
                     } else {
                         SemiJoinServer serverInstance = new SemiJoinServer(new File(cmd.getArgs()[0]));
+                        serverInstance.join();
+                        measuredJoin = serverInstance;
+                    }
+                    
+                    
+                } else {
+                    throw new ParseException("ship whole mode requires one parameters (<file A>");
+                }
+            }
+            
+            /* parallel semi join */
+            if(cmd.hasOption("semi-parallel")) {
+                if(cmd.getArgList().size() == 1) {
+                    String server = cmd.getOptionValue("connect-to");
+                    if(server != null) {
+                        new SemiJoinClient(new File(cmd.getArgs()[0]), server);
+                    } else {
+                        ParallelSemiJoinServer serverInstance = new ParallelSemiJoinServer(new File(cmd.getArgs()[0]));
                         serverInstance.join();
                         measuredJoin = serverInstance;
                     }

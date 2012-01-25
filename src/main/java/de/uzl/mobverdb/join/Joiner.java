@@ -16,6 +16,8 @@ import de.uzl.mobverdb.join.modes.LocalJoin;
 import de.uzl.mobverdb.join.modes.MeasurableJoin;
 import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeededClient;
 import de.uzl.mobverdb.join.modes.fetchasneed.FetchNeededServer;
+import de.uzl.mobverdb.join.modes.semi.SemiJoinClient;
+import de.uzl.mobverdb.join.modes.semi.SemiJoinServer;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeClient;
 import de.uzl.mobverdb.join.modes.shipwhole.ShipWholeServer;
 
@@ -34,6 +36,7 @@ public class Joiner {
         mode.addOption(new Option("l", "local", false, "Do a local join"));
         mode.addOption(new Option("w", "ship-whole", false, "Ship-whole join"));
         mode.addOption(new Option("f", "fetch-needed", false, "Fetch-as-needed join"));
+        mode.addOption(new Option("s", "semi", false, "Semi join"));
         options.addOptionGroup(mode);
         
         options.addOption("c", "connect-to", true, "in client/server mode: where to connect to");
@@ -98,7 +101,25 @@ public class Joiner {
                 } else {
                     throw new ParseException("ship whole mode requires one parameters (<file A>");
                 }
-            }   
+            } 
+            
+            /* semi join */
+            if(cmd.hasOption("semi")) {
+                if(cmd.getArgList().size() == 1) {
+                    String server = cmd.getOptionValue("connect-to");
+                    if(server != null) {
+                        new SemiJoinClient(new File(cmd.getArgs()[0]), server);
+                    } else {
+                        SemiJoinServer serverInstance = new SemiJoinServer(new File(cmd.getArgs()[0]));
+                        serverInstance.join();
+                        measuredJoin = serverInstance;
+                    }
+                    
+                    
+                } else {
+                    throw new ParseException("ship whole mode requires one parameters (<file A>");
+                }
+            }
             
             if(measuredJoin != null) {
                 System.out.println(measuredJoin.getPerf());

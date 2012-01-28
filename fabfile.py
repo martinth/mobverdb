@@ -18,17 +18,78 @@ SORT_FILE = 'faust.txt'
 env.user = 'root'
 env.key_filename = os.path.expanduser('~/'+KEY_NAME+'.pem')
 
-def test_localjoin():        
+#
+# JOINING
+#
+def join_local():    
+    '''local join on a single instance'''    
     request(1)
-    execute(start_join_server, 'local', files=JOIN_FILES[:2])
-    execute(fetch_sort_perflog, 'local')
+    execute(start_join_server, 'local', files=JOIN_FILES[:2], bg=False)
+    execute(fetch_join_perflog, 'local')
+    env.hosts = []
     
+def join_shipwhole():    
+    '''ship-whole join with two clients'''    
+    request(3)
+    mode = 'ship-whole'
+    execute(start_join_server, mode, file=JOIN_FILES[2])
+    execute(start_join_clients, mode, file=JOIN_FILES[0])
+    execute(fetch_join_perflog, mode)
+    env.hosts = []
+   
+def join_fetchasneeded():    
+    '''fetch-as-needed join with one clients'''    
+    request(2)
+    mode = 'fetch-needed'
+    execute(start_join_server, mode, file=JOIN_FILES[2])
+    execute(start_join_clients, mode, file=JOIN_FILES[0])
+    execute(fetch_join_perflog, mode)
+    env.hosts = []
+    
+def join_bitvektor(sizes='10'):    
+    '''bitvektor join with one clients. Paramter must be a space seperated list of blocksizes'''    
+    request(2)
+    mode = 'bitvektor'
+    
+    for s in sizes.split(' '):
+        execute(start_join_server, mode, blocksize=s, file=JOIN_FILES[2])
+        execute(start_join_clients, mode, file=JOIN_FILES[0])
+        execute(fetch_join_perflog, mode)
+    env.hosts = []
+    
+def join_semi():    
+    '''simple semi join with one clients'''    
+    request(2)
+    mode = 'semi'
+    execute(start_join_server, mode, file=JOIN_FILES[2])
+    execute(start_join_clients, mode, file=JOIN_FILES[0])
+    execute(fetch_join_perflog, mode)
+    env.hosts = []
+    
+def join_semiparallel():    
+    '''parallel semi join with two clients'''    
+    request(3)
+    mode = 'semi-parallel'
+    execute(start_join_server, mode, file=JOIN_FILES[2])
+    execute(start_join_clients, mode, file=JOIN_FILES[0])
+    execute(fetch_join_perflog, mode)
+    env.hosts = []
+    
+def join_semisequential():    
+    '''sequential semi join with two clients'''    
+    request(3)
+    mode = 'semi-sequential'
+    execute(start_join_server, mode, file=JOIN_FILES[2])
+    execute(start_join_clients, mode, file=JOIN_FILES[0])
+    execute(fetch_join_perflog, mode)
+    env.hosts = []
     
 @roles('server')
-def fetch_join_perflog(prefix):
-    pass
-    #get('perf.log', '%perf_%s.log' % prefix)
-
+def fetch_join_perflog(type, size=None):
+    output_name = 'perf_%s.log' % type
+    if size:
+        output_name = 'perf_%s_%s.log' % (type, size)
+    get('perf.log', output_name)
 
 @roles('server')
 def start_join_server(mode, file='', files=(), blocksize=10, bg=True):
@@ -50,7 +111,7 @@ def start_join_server(mode, file='', files=(), blocksize=10, bg=True):
 
 @roles('client')
 @parallel
-def start_join_clients(mode, file='', bg=True):
+def start_join_clients(mode, file='', bg=False):
     '''start client (parallel) and let them connect to server'''
     _kill_java()
     
@@ -64,6 +125,10 @@ def start_join_clients(mode, file='', bg=True):
     if file:
         cmd += [file]
     run(' '.join(map(str, cmd)))
+    
+#
+# SORTING
+#
 
 def test_mergesort(clients, sizes):
     '''Test the performance of mergesort.

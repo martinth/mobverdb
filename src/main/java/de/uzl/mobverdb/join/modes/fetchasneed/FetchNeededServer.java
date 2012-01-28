@@ -44,9 +44,10 @@ public class FetchNeededServer extends UnicastRemoteObject implements IFetchNeed
             Threads.trySleep(1000);
         }
         log.info("Client connected. Beginning to join.");
-        this.joinPerf.startAll();
         ArrayList<Row> output = new ArrayList<Row>();
         
+        joinPerf.totalTime.start();
+        joinPerf.localJoinTime.start();
         for(Row localRow : data.lines) {
             Row[] otherRows = this.other.getRows(localRow.getKey());
             this.joinPerf.rmiCall();
@@ -54,9 +55,11 @@ public class FetchNeededServer extends UnicastRemoteObject implements IFetchNeed
                 output.add( new Row(localRow.getKey(), Iterables.concat(localRow.getData(), otherRow.getData())) );
             }
         }
-        log.info("Join finished.");
-        this.joinPerf.stopAll();
+        joinPerf.localJoinTime.stop();
+        joinPerf.totalTime.stop();
         
+        log.info("Join finished.");
+                
         try {
             this.other.shutdown();
             Threads.trySleep(1000);

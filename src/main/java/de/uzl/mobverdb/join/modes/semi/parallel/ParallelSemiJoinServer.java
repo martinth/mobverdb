@@ -52,12 +52,15 @@ public class ParallelSemiJoinServer extends UnicastRemoteObject implements ISemi
         joinPerf.totalTime.start();
         
         log.info("Creating projection of local data");
+        joinPerf.prepareTime.start();
         final Set<Integer> localKeys = new HashSet<Integer>();
         for(Row r : data.lines) {
             localKeys.add(r.getKey());
         }
+        joinPerf.prepareTime.stop();
         
         log.info("Sending keys to clients (in parallel)");
+        joinPerf.remoteJoinTime.start();
         ArrayList<Thread> clientThreads = new ArrayList<Thread>();
         final ArrayList<Row[]> clientData = new ArrayList<Row[]>();
         for(final ISemiJoinClient client : clients) {
@@ -79,12 +82,14 @@ public class ParallelSemiJoinServer extends UnicastRemoteObject implements ISemi
         for(Thread t : clientThreads) {
             t.join();
         }
-        joinPerf.joinTime.start();
+        joinPerf.remoteJoinTime.stop();
+        joinPerf.localJoinTime.start();
         Row[] joinedData = data.lines;
         for(Row[] remoteData : clientData) {
             joinedData = JoinUtils.nestedLoopJoin(data.lines, remoteData);
         }
-        joinPerf.stopAll();
+        joinPerf.localJoinTime.stop();
+        joinPerf.totalTime.stop();
         
         for(ISemiJoinClient client : clients) {
             try {

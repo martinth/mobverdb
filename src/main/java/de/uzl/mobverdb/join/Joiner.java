@@ -37,19 +37,18 @@ public class Joiner {
         
         // option group for join type
         OptionGroup mode = new OptionGroup();
-        mode.addOption(new Option("l", "local", false, "Do a local join"));
-        mode.addOption(new Option("w", "ship-whole", false, "Ship-whole join"));
-        mode.addOption(new Option("f", "fetch-needed", false, "Fetch-as-needed join"));
-        mode.addOption(new Option("s", "semi", false, "Semi join"));
-        mode.addOption(new Option("sp", "semi-parallel", false, "Parallel semi join"));
-        mode.addOption(new Option("ss", "semi-sequential", false, "Sequential semi join"));
-        mode.addOption(new Option("b", "bitvektor", false, "Bitvektor join"));
+        mode.addOption(new Option("l", "local", false, "local join (requires only server)"));
+        mode.addOption(new Option("w", "ship-whole", false, "ship-whole (requires two clients)"));
+        mode.addOption(new Option("f", "fetch-needed", false, "fetch-as-needed (requires one client)"));
+        mode.addOption(new Option("s", "semi", false, "semi join (requires one client)"));
+        mode.addOption(new Option("sp", "semi-parallel", false, "parallel semi join (requires two clients)"));
+        mode.addOption(new Option("ss", "semi-sequential", false, "sequential semi join (requires two clients)"));
+        mode.addOption(new Option("b", "bitvektor", false, "bitvektor join (requires one client)"));
         options.addOptionGroup(mode);
         
-        options.addOption("c", "connect-to", true, "in client/server mode: where to connect to");
-        options.addOption("bs", "blocksize", true, "blocksize (if applicable)");
+        options.addOption("c", "connect-to", true, "local instance is a client. Parameter: where to connect to");
+        options.addOption("bs", "blocksize", true, "blocksize (if applicable, otherwise not used)");
         
-        //options.addOption(new Option("b", "blocksize", true, "Blocksize for data fetching from client (default: 10)"));
         CommandLineParser parser = new PosixParser();
         try {
             setupAndRun(parser.parse(options, args));
@@ -78,7 +77,7 @@ public class Joiner {
             }
                 
             /* ship whole join */
-            if(cmd.hasOption("ship-whole")) {
+            else if(cmd.hasOption("ship-whole")) {
                 String server = cmd.getOptionValue("connect-to");
                 if(server != null) {
                     if(cmd.getArgList().size() == 1) {
@@ -94,7 +93,7 @@ public class Joiner {
             }   
             
             /* fetch as needed join */
-            if(cmd.hasOption("fetch-needed")) {
+            else if(cmd.hasOption("fetch-needed")) {
                 if(cmd.getArgList().size() == 1) {
                     String server = cmd.getOptionValue("connect-to");
                     if(server != null) {
@@ -112,7 +111,7 @@ public class Joiner {
             } 
             
             /* semi join */
-            if(cmd.hasOption("semi")) {
+            else if(cmd.hasOption("semi")) {
                 if(cmd.getArgList().size() == 1) {
                     String server = cmd.getOptionValue("connect-to");
                     if(server != null) {
@@ -130,7 +129,7 @@ public class Joiner {
             }
             
             /* semi join */
-            if(cmd.hasOption("bitvektor")) {
+            else if(cmd.hasOption("bitvektor")) {
                 if(cmd.getArgList().size() == 1) {
                     String server = cmd.getOptionValue("connect-to");
                     if(server != null) {
@@ -147,7 +146,7 @@ public class Joiner {
             }
             
             /* sequential semi join */
-            if(cmd.hasOption("semi-sequential")) {
+            else if(cmd.hasOption("semi-sequential")) {
                 if(cmd.getArgList().size() == 1) {
                     String server = cmd.getOptionValue("connect-to");
                     if(server != null) {
@@ -165,7 +164,7 @@ public class Joiner {
             }
             
             /* parallel semi join */
-            if(cmd.hasOption("semi-parallel")) {
+            else if(cmd.hasOption("semi-parallel")) {
                 if(cmd.getArgList().size() == 1) {
                     String server = cmd.getOptionValue("connect-to");
                     if(server != null) {
@@ -182,12 +181,18 @@ public class Joiner {
                 }
             }
             
+            else {
+                throw new ParseException("use at least one mode parameter");
+            }
+            
             if(measuredJoin != null) {
                 System.out.println(measuredJoin.getPerf());
                 measuredJoin.getPerf().writeTofile("perf.log");
                 System.exit(0);
             }
-
+             
+        } catch (ParseException e) {
+            throw e;
         } catch (Exception e) {
             log.fatal("Failed with Exception", e);
             System.exit(1);

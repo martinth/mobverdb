@@ -52,25 +52,29 @@ public class SequentialSemiJoinServer extends UnicastRemoteObject implements ISe
         joinPerf.totalTime.start();
         
         log.info("Creating projection of local data");
+        joinPerf.prepareTime.start();
         final Set<Integer> localKeys = new HashSet<Integer>();
         for(Row r : data.lines) {
             localKeys.add(r.getKey());
         }
+        joinPerf.prepareTime.stop();
         
         log.info("Sending keys to clients (sequential)");
+        joinPerf.remoteJoinTime.start();
         final ArrayList<Row[]> clientData = new ArrayList<Row[]>();
         for(final ISemiJoinClient client : clients) {
             clientData.add(client.joinOn(localKeys.toArray(new Integer[] {})));
             joinPerf.rmiCall();
         }
+        joinPerf.remoteJoinTime.stop();
         
-        joinPerf.joinTime.start();
+        joinPerf.localJoinTime.start();
         Row[] joinedData = data.lines;
         for(Row[] remoteData : clientData) {
             joinedData = JoinUtils.nestedLoopJoin(data.lines, remoteData);
         }
-        joinPerf.stopAll();
-        
+        joinPerf.localJoinTime.stop();
+        joinPerf.totalTime.start();
         for(ISemiJoinClient client : clients) {
             try {
                 client.shutdown();

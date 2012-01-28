@@ -41,16 +41,17 @@ public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeSe
             Threads.trySleep(1000);
         }
         log.info("Two clients connect, fetching their data");
-        this.joinPerf.totalTime.start();
+        joinPerf.totalTime.start();
         
         Row[] dataR = this.clients.get(0).getData();
         Row[] dataS = this.clients.get(1).getData();
         this.joinPerf.rmiCalls(2);
         
         log.info("Data fetched, beginning to join");
-        this.joinPerf.joinTime.start();
-        this.output = JoinUtils.nestedLoopJoin(dataR, dataS);
-        this.joinPerf.stopAll();
+        joinPerf.localJoinTime.start();
+        output = JoinUtils.nestedLoopJoin(dataR, dataS);
+        joinPerf.localJoinTime.stop();
+        joinPerf.totalTime.stop();
         
         log.info("Join completed");
         

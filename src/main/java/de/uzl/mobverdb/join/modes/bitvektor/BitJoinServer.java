@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -52,20 +51,24 @@ public class BitJoinServer extends UnicastRemoteObject implements IBitJoinServer
         joinPerf.totalTime.start();
         
         log.info("Creating bitvektor of local data");
+        joinPerf.prepareTime.start();
         BitSet bitSet = new BitSet(vektorSize);
         UniversalHash hashFunc = new UniversalHash(vektorSize);
         for(Row r : data.lines) {
             bitSet.set(hashFunc.hash(r.getKey()), true);
         }
+        joinPerf.prepareTime.stop();
         
         log.info("Fetching from client");
+        joinPerf.remoteJoinTime.start();
         Row[] remoteJoinedData = client.joinOn(bitSet, hashFunc);
         joinPerf.rmiCall();
+        joinPerf.remoteJoinTime.stop();
         
-        joinPerf.joinTime.start();
+        joinPerf.localJoinTime.start();
         log.info("Doing Local join");
-        Row[] joinedData = JoinUtils.nestedLoopJoin(data.lines, remoteJoinedData);
-        joinPerf.stopAll();
+        JoinUtils.nestedLoopJoin(data.lines, remoteJoinedData);
+        joinPerf.localJoinTime.stop();
         
         try {
             this.client.shutdown();

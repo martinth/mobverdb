@@ -1,0 +1,10 @@
+jointype, prepare (msec) , localjoin (msec), remotejoin (msec), total (msec), rmi calls (#)
+bitvektor_1000, 14, 587, 99, 1058, 1
+bitvektor_100, 9, 588, 103, 1058, 1
+bitvektor_10, 12, 593, 105, 1075, 1
+fetchAsNeeded, 0, 2496, 0, 2496, 4000
+localJoin, 809, 809, 809, 809, 0
+semiJoin, 0, 557, 176, 735, 1
+parallelSemiJoin, 0, 981, 226, 1209, 2
+sequentialSemiJoin, 0, 999, 293, 1294, 2
+shipWholeJoin, 0, 757, 0, 943, 2

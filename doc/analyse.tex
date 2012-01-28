@@ -83,7 +83,8 @@
 \DeclareMathOperator{\es}{empty}
 
 \begin{document}
-\section{Testreihen}
+
+\section{Verteiltes Sortieren}
 \subsection{Umgebung}
 Um das verteilte Sortieren sinnvoll Testen zu könne, ist es notwendig die Ausführung auf mehrere Rechner zu verteilen. Eine rein lokale Ausführung würde zum einen keinen realistischen Kommunikationoverhead bedeuten, zum anderen wäre die Ausführung an die Leistungsfähigkeit der lokalen CPU gebunden.
 
@@ -94,5 +95,92 @@ Die Performancemessung wird ausschließlich auf dem Server durchgeführt. Der Se
 
 \subsection{Parameter der Messungen}
 Die Messreihen wurden jeweils mit 2, 4, 8 und 16 Sortierclients und einem Server durchgeführt. Dabei wurden jeweils die Blockgrößen 10, 100, 1000 und 10000 getestet. Für die lokale Sortierung gelten diese Parameter natürlich nicht, hierbei wurde nur die Sortierung mittels \texttt{Colletions.sort()} ausgeführt. Als Daten die sortiert werden sollen wurden Goethes Faust I und II ausgewählt, die dem Projekt Gutenberg als Textdatei entnommen wurden. Die Testdatei hat dabei eine Dateigröße von 556 Kilobyte und wird vom Server vor der Verteilung an jedem Whitespace aufgetrennt. Dabei entstehen 81333 einzelne Strings, die dann Sortiert wurden.
+
+\subsection{Auswertung}
+Zur weiteren Referenz werden zunächst einmal die Messerte für das lokale Sortieren gegeben. 
+Die folgende Messerte sind dabei angegeben:
+\begin{itemize}
+  \item Blockgröße: die verwende Blockgröße, d.h. wie viele Blöcke beim Iterieren über die sortierten Daten auf einmal vom Client zum Server übertragen werden.
+  \item \# Clients: wie viele Clients am Sortieren beteiligt waren
+  \item $t_{add}$: Wie lange der Server für das Einlesen der Daten und das Einfügen in eine lokale, unsortierte Liste benötigt hat.
+  \item $t_{distribute}$: Wie lange die der Server zum Aufteilen und Verteilen der unsortierten Daten an die Clients benötigt hat. Die Clients beginnen unmittelbar nach dem Übertragen der Daten mit der Sortierung.
+  \item $t_{iter}$: Wie lange der Server für der Iterieren über die sortierten Daten benötigt hat. Dies umfasst dabei auch die Kommunikationskosten - hier wirkt sich also die Blockgröße unmittelbar aus.
+  \item  $t_{total}$: Die gesamte Ausführungszeit. Dies beinhaltet alle anderen gemessene Zeiten plus den benötigten Verwaltungsoverhead.  
+\end{itemize}
+
+Zunächst werden die Messwerte für das loakle Sortieren gegeben. Beim lokalen Sortieren wurden lediglich die Werte für das einfügen der Daten in einer lokale, unsortierte Liste ($t_{add}$), das Iterieren über die sortierten Ergebnisse ($t_{iter}$) und die Gesamtzeit gemessen, da die restlichen Messgrößen hierbei keine Rolle spielen. Auf die Ergebnisse wird an dieser Stelle nicht eingegangen, dies wird an späterer Stelle, im Zusammenhang mit den anderen Sortierverfahren erledigt. 
+\begin{table}[htp]
+\begin{tabularx}{\textwidth}{ |X|X|X|X|X|X| }
+\hline
+Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ (ms) & $t_{total}$ (ms) \\
+\hline
+0 & 0 & 66 & 0 & 4 & 307 \\
+\hline
+\end{tabularx}
+\caption{Ergenisdaten: Lokales sortieren (mittels \texttt{Collections.sort(\ldots)})}
+\end{table}
+
+\subsubsection{Verteiltes \textit{merge sort}}
+\begin{table}[htp]
+\begin{tabularx}{\textwidth}{ |X|X|X|X|X|X| }
+\hline
+Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ (ms) & $t_{total}$ (ms) \\
+\hline
+10 & 2 & 104 & 533 & 8960 & 10908 \\
+100 & 2 & 103 & 353 & 1489 & 2850 \\
+1000 & 2 & 103 & 347 & 721 & 2080 \\
+10000 & 2 & 102 & 338 & 559 & 1904 \\
+\hline
+10 & 4 & 103 & 467 & 11469 & 15145 \\
+100 & 4 & 103 & 365 & 2050 & 3423 \\
+1000 & 4 & 101 & 394 & 957 & 2557 \\
+10000 & 4 & 103 & 337 & 756 & 2101 \\
+\hline
+10 & 8 & 99 & 1230 & 19300 & 23840 \\
+100 & 8 & 99 & 523 & 2898 & 5126 \\
+1000 & 8 & 112 & 619 & 1854 & 3924 \\
+10000 & 8 & 108 & 552 & 964 & 2961 \\
+\hline
+10 & 16 & 105 & 854 & 25589 & 33684 \\
+100 & 16 & 109 & 791 & 3982 & 11406 \\
+1000 & 16 & 98 & 1310 & 2274 & 10494 \\
+10000 & 16 & 108 & 838 & 1177 & 8578 \\
+\hline
+\end{tabularx}
+\caption{Ergenisdaten: Verteiltes \textit{merge sort}}
+\end{table}
+
+\subsubsection{Verteiltes \textit{distribution sort}}
+\begin{table}[htp]
+\begin{tabularx}{\textwidth}{ |X|X|X|X|X|X| }
+\hline
+Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ (ms) & $t_{total}$ (ms) \\
+\hline
+10 & 2 & 102 & 501 & 4844 & 7792 \\
+100 & 2 & 103 & 573 & 1514 & 4506 \\
+1000 & 2 & 100 & 468 & 556 & 3438 \\
+10000 & 2 & 116 & 527 & 665 & 3614 \\
+\hline
+10 & 4 & 99 & 443 & 6873 & 9822 \\ 
+100 & 4 & 109 & 516 & 1831 & 4662 \\ 
+1000 & 4 & 122 & 352 & 483 & 3278 \\ 
+10000 & 4 & 112 & 501 & 597 & 3415 \\
+\hline
+10 & 8 & 99 & 591 & 12638 & 15737 \\
+100 & 8 & 117 & 451 & 1676 & 4658 \\
+1000 & 8 & 111 & 577 & 985 & 3980 \\
+10000 & 8 & 102 & 706 & 742 & 4190 \\
+\hline
+10 & 16 & 107 & 611 & 15080 & 18305 \\
+100 & 16 & 110 & 867 & 2547 & 5938 \\
+1000 & 16 & 103 & 752 & 861 & 4314 \\
+10000 & 16 & 109 & 864 & 760 & 4351 \\
+\hline
+\end{tabularx}
+\caption{Ergenisdaten : Verteiltes \textit{distribution sort}}
+\end{table}
+
+
+
 \end{document}
 

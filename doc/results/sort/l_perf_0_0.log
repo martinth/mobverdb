@@ -1,2 +1,2 @@
 sorttype, blocksize, clients, add (msec), distribute (msec), fetch/iter (msec), total (msec)
-LOCAL, 0, 0, 223, 0, 0, 345
+LOCAL, 0, 0, 66, 0, 4, 307

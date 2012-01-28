@@ -141,5 +141,13 @@ public class SortServer extends Thread {
         
         Collections.sort(toSort);
         
+     // iterate over results
+        iterateWatch.start();
+        Iterator<String> iter = toSort.iterator();
+        while(iter.hasNext()) {
+            iter.next();
+        }
+        iterateWatch.stop();
+        
     }
 }

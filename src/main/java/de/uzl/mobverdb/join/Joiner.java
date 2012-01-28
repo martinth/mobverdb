@@ -184,6 +184,7 @@ public class Joiner {
             
             if(measuredJoin != null) {
                 System.out.println(measuredJoin.getPerf());
+                measuredJoin.getPerf().writeTofile("perf.log");
                 System.exit(0);
             }
 

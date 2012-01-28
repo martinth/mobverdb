@@ -17,7 +17,7 @@ public class LocalJoin implements MeasurableJoin {
     
     private CSVData dataA;
     private CSVData dataB;
-    private JoinPerf joinPerf = new JoinPerf();
+    private JoinPerf joinPerf = new JoinPerf("localJoin");
     
     public LocalJoin(File fileA, File fileB) throws NumberFormatException, IOException {
         this.dataA = new CSVData(fileA);

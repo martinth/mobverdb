@@ -26,7 +26,7 @@ public class SemiJoinServer extends UnicastRemoteObject implements ISemiJoinServ
     private static final long serialVersionUID = -5035845909042215587L;
     private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
     public static final String BIND_NAME = "semiJoin";
-    private JoinPerf joinPerf = new JoinPerf();
+    private JoinPerf joinPerf = new JoinPerf(BIND_NAME);
 
     private ISemiJoinClient client;
     private CSVData data;

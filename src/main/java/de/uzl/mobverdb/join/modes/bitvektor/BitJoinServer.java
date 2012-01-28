@@ -10,9 +10,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.BitSet;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 import de.uzl.mobverdb.join.JoinUtils;
@@ -24,9 +21,10 @@ import de.uzl.utils.Threads;
 
 public class BitJoinServer extends UnicastRemoteObject implements IBitJoinServer, MeasurableJoin {
 
+    private static final long serialVersionUID = 9078308810431595227L;
     private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
     public static final String BIND_NAME = "semiJoin";
-    private JoinPerf joinPerf = new JoinPerf();
+    private JoinPerf joinPerf = new JoinPerf(BIND_NAME);
 
     private IBitJoinClient client;
     private CSVData data;

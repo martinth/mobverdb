@@ -22,14 +22,15 @@ import de.uzl.mobverdb.join.modes.JoinPerf;
 import de.uzl.mobverdb.join.modes.MeasurableJoin;
 import de.uzl.mobverdb.join.modes.semi.ISemiJoinClient;
 import de.uzl.mobverdb.join.modes.semi.ISemiJoinServer;
+import de.uzl.mobverdb.join.modes.semi.SemiJoinServer;
 import de.uzl.utils.Threads;
 
 public class ParallelSemiJoinServer extends UnicastRemoteObject implements ISemiJoinServer, MeasurableJoin {
 
     private static final long serialVersionUID = 2866604506401341939L;
     private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
-    public static final String BIND_NAME = "semiJoin";
-    private JoinPerf joinPerf = new JoinPerf();
+    public static final String BIND_NAME = SemiJoinServer.BIND_NAME;
+    private JoinPerf joinPerf = new JoinPerf("parallelSemiJoin");
 
     private ArrayList<ISemiJoinClient> clients = new ArrayList<ISemiJoinClient>();
     private CSVData data;

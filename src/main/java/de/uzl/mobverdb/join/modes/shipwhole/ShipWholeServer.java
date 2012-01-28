@@ -20,10 +20,11 @@ public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeSe
     
     private static final long serialVersionUID = -5430396965086442250L;
     private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
+    public final static String BIND_NAME = "shipWholeJoin"; 
+    private JoinPerf joinPerf = new JoinPerf(BIND_NAME);
+
     private ArrayList<IShipWholeClient> clients = new ArrayList<IShipWholeClient>();
     Row[] output;
-    private JoinPerf joinPerf = new JoinPerf();
-    public final static String BIND_NAME = "shipWholeServer"; 
     
     public ShipWholeServer() throws RemoteException {
         super();

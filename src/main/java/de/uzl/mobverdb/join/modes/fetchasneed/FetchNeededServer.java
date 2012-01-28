@@ -24,9 +24,10 @@ public class FetchNeededServer extends UnicastRemoteObject implements IFetchNeed
     private static final long serialVersionUID = 4715642595903345304L;
     private final Logger log = Logger.getLogger(this.getClass().getCanonicalName());
     public static final String BIND_NAME = "fetchAsNeeded";
+    private JoinPerf joinPerf = new JoinPerf(BIND_NAME);
+
     private IFetchNeededClient other;
     private CSVData data;
-    private JoinPerf joinPerf = new JoinPerf();
     
     public FetchNeededServer(File file) throws NumberFormatException, IOException, NotBoundException {
         super();

@@ -149,6 +149,11 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 \end{tabularx}
 \caption{Ergenisdaten: Verteiltes \textit{merge sort}}
 \end{table}
+Wie zu Erwarten besteht beim Merge-Sort ein direkter Zusammehang zwischen Blockgröße und der Gesamt-Ausführungszeit: Je höher die Blockgröße, destoe schneller die Gesamtzeit. Dies ist jeweils auf den kleineren $t_{iter}$ Wert zurückzuführen. Offenbar ist es Vorteilhaft, möglichste große Blöcke zu übertragen. Dies ist möglicherweise auf die TCP-basierte Kommunikation und den dabei verwendeten Slow-Start-Algorithmus zurückzuführen.
+ 
+Außerdem ist auffällig, dass die Variante mit nur 2 Clients die kürzeste Gesamt-Ausführungszeit hat. Dies resultiert dabei offensichtlich auf dem niedrigen Wert für $t_{distribute}$. Offenbar ist hiermit ein nicht unerheblicher Verwaltungs-Overhead verbunden, der durch der ausgelagerte Sortieren nicht wieder reingeholt werden kann.
+
+Ferner ist zu Bemerken, das der Unterschied zwischen der Blockgröße von 1000 und 10000 nichts so groß ausfällt, wie zwischen 1000 und den kleinere Blockgrößen. Offenbar liegt der Wert für die optimale Blockgröße (für diese Menge an zu sortierenden Daten) irgendwo zwischen diesen beiden Werten.
 
 \subsubsection{Verteiltes \textit{distribution sort}}
 \begin{table}[htp]
@@ -179,8 +184,12 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 \end{tabularx}
 \caption{Ergenisdaten : Verteiltes \textit{distribution sort}}
 \end{table}
+Auch beim Distribution-Sort besteht offenbar ein Zusammenhang zwischen Blockgröße und Ausführungszeit. Hierbei ist jedoch auffällig, dass die optimale Blockgröße (abermals bezogen auf diese Datenmenge) sehr dich an einem Wert von 1000 liegt. Darüber steigt die Ausführungszeit wieder leicht an. \todo{Kann man da noch was rein interpretieren?} 
 
+Die optimale Client Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei die Werte für 2, 4 und 8 Clients ingesamt dichter beeinander liegen, als dies bei Mergesort der Fall war. Offenbar skaliert Distributionsort im Gegensatz zu Mergesort bei steigender Clientanzalh etwas besser. Dabei ist Distributionsort bei der hier vorliegenden Datenmenge im Optimalfall etwa um den Faktor 1,5 langsamder als Mergesort, was allerdings möglichweise auch auf Implementierugnsdetails zurück zu führen ist.
 
-
+\subsubsection{Vergleich der verteilten Verfahren mit lokalem Sortieren}
+Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich. Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil. Denn für ein verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbunderen (linare) Aufwand hat allerdings einen, um ein vielfaches höheren Vorfaktor als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell, und der lokale Speicherzugriff unglaublich langsam ist, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen kann. Zu Beachten ist jedoch, dass dies nur gilt, solange die Daten im Vorneherein übertragen werden müssen.
+ 
 \end{document}
 

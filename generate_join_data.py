@@ -1,7 +1,7 @@
 import random
 
 # how many items should be generated
-AMOUNT = 1000
+AMOUNT = 5000
 
 # create data and write file A (note: AMOUNT*0.7 is used to generate more matches between A and B)
 join_a = open('join-data-a.csv', 'w')

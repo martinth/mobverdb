@@ -1,0 +1,2 @@
+jointype, prepare (msec) , localjoin (msec), remotejoin (msec), total (msec), rmi calls (#)
+parallelSemiJoin, 0, 981, 226, 1209, 2

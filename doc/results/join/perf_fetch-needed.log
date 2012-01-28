@@ -1,0 +1,2 @@
+jointype, prepare (msec) , localjoin (msec), remotejoin (msec), total (msec), rmi calls (#)
+fetchAsNeeded, 0, 2496, 0, 2496, 4000

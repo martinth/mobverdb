@@ -74,7 +74,7 @@ public class SequentialSemiJoinServer extends UnicastRemoteObject implements ISe
             joinedData = JoinUtils.nestedLoopJoin(data.lines, remoteData);
         }
         joinPerf.localJoinTime.stop();
-        joinPerf.totalTime.start();
+        joinPerf.totalTime.stop();
         for(ISemiJoinClient client : clients) {
             try {
                 client.shutdown();

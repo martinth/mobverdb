@@ -1,0 +1,2 @@
+jointype, prepare (msec) , localjoin (msec), remotejoin (msec), total (msec), rmi calls (#)
+semiJoin, 0, 557, 176, 735, 1

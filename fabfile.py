@@ -1,4 +1,5 @@
 import os
+import os.path
 import time
 import socket
 from itertools import product
@@ -54,7 +55,7 @@ def join_bitvektor(sizes='10'):
     for s in sizes.split(' '):
         execute(start_join_server, mode, blocksize=s, file=JOIN_FILES[2])
         execute(start_join_clients, mode, file=JOIN_FILES[0])
-        execute(fetch_join_perflog, mode)
+        execute(fetch_join_perflog, mode, blocksize=s)
     env.hosts = []
     
 def join_semi():    
@@ -85,10 +86,10 @@ def join_semisequential():
     env.hosts = []
     
 @roles('server')
-def fetch_join_perflog(type, size=None):
+def fetch_join_perflog(type, blocksize=None):
     output_name = 'perf_%s.log' % type
-    if size:
-        output_name = 'perf_%s_%s.log' % (type, size)
+    if blocksize:
+        output_name = 'perf_%s_%s.log' % (type, blocksize)
     get('perf.log', output_name)
 
 @roles('server')
@@ -285,6 +286,10 @@ def copy_files():
     put('target/'+JOIN_JAR, JOIN_JAR)
     for file in JOIN_FILES:
         put(file, file)
+
+def copy_file(filename):
+    '''copy a single file to all'''
+    put(filename, os.path.basename(filename))
 
 @parallel(pool_size=3) 
 def install_environment():

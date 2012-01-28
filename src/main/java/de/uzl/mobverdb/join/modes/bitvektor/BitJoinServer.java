@@ -67,13 +67,14 @@ public class BitJoinServer extends UnicastRemoteObject implements IBitJoinServer
         Row[] joinedData = JoinUtils.nestedLoopJoin(data.lines, remoteJoinedData);
         joinPerf.stopAll();
         
-        client = null;
         try {
+            this.client.shutdown();
+            Threads.trySleep(1000);
             Naming.unbind(BIND_NAME);
-        } catch (NotBoundException e) {
-            // we ignore this
+            UnicastRemoteObject.unexportObject(reg, true);
+        } catch(Exception e) {
+            // ignore this, we will exit anyway
         }
-        UnicastRemoteObject.unexportObject(reg, true);
     }
 
     @Override

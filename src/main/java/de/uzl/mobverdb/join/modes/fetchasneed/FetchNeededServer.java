@@ -57,14 +57,14 @@ public class FetchNeededServer extends UnicastRemoteObject implements IFetchNeed
         log.info("Join finished.");
         this.joinPerf.stopAll();
         
-        this.other = null;
         try {
+            this.other.shutdown();
+            Threads.trySleep(1000);
             Naming.unbind(BIND_NAME);
-        } catch (NotBoundException e) {
-            // we ignore this
+            UnicastRemoteObject.unexportObject(reg, true);
+        } catch(Exception e) {
+            // ignore this, we will exit anyway
         }
-        UnicastRemoteObject.unexportObject(reg, true);
-        
     }
 
     @Override

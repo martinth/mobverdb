@@ -39,4 +39,8 @@ public class BitJoinClient extends UnicastRemoteObject implements IBitJoinClient
         return output.toArray(new Row[] {});
     }
 
+    @Override
+    public void shutdown() throws RemoteException {
+        System.exit(0);
+    }
 }

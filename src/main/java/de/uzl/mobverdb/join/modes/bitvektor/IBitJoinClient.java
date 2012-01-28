@@ -8,4 +8,5 @@ import de.uzl.mobverdb.join.data.Row;
 
 public interface IBitJoinClient extends Remote {
     public Row[] joinOn(BitSet bitSet, UniversalHash hashFunc)throws RemoteException;
+    public void shutdown() throws RemoteException;
 }

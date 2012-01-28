@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
@@ -41,4 +42,8 @@ public class SemiJoinClient extends UnicastRemoteObject implements ISemiJoinClie
         return output.toArray(new Row[] {});
     }
 
+    @Override
+    public void shutdown() throws RemoteException {
+        System.exit(0);
+    }
 }

@@ -26,4 +26,8 @@ public class ShipWholeClient extends UnicastRemoteObject implements IShipWholeCl
         return this.data.lines;
     }
 
+    @Override
+    public void shutdown() throws RemoteException {
+        System.exit(0);
+    }
 }

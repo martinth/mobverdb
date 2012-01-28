@@ -7,4 +7,5 @@ import de.uzl.mobverdb.join.data.Row;
 
 public interface IFetchNeededClient extends Remote {
     public Row[] getRows(int key) throws RemoteException;
+    public void shutdown() throws RemoteException;
 }

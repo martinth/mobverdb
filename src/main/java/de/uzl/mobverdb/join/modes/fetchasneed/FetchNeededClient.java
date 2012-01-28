@@ -32,10 +32,13 @@ public class FetchNeededClient extends UnicastRemoteObject implements IFetchNeed
         server.register(this);
     }
     
-
     @Override
     public Row[] getRows(int key) throws RemoteException {
         return Iterables.toArray(this.keyToData.get(key), Row.class);
     }
 
+    @Override
+    public void shutdown() throws RemoteException {
+        System.exit(0);
+    }
 }

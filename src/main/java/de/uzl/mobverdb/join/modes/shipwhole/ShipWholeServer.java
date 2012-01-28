@@ -14,6 +14,7 @@ import de.uzl.mobverdb.join.JoinUtils;
 import de.uzl.mobverdb.join.data.Row;
 import de.uzl.mobverdb.join.modes.JoinPerf;
 import de.uzl.mobverdb.join.modes.MeasurableJoin;
+import de.uzl.mobverdb.join.modes.semi.ISemiJoinClient;
 import de.uzl.utils.Threads;
 
 public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeServer, MeasurableJoin {
@@ -53,13 +54,20 @@ public class ShipWholeServer extends UnicastRemoteObject implements IShipWholeSe
         
         log.info("Join completed");
         
-        this.clients.clear();
+        for(IShipWholeClient client : clients) {
+            try {
+                client.shutdown();
+            } catch(Exception e) {
+                // ignore this, we will exit anyway
+            }
+        }
+        
         try {
             Naming.unbind(BIND_NAME);
-        } catch (NotBoundException e) {
-            // we ignore this
+            UnicastRemoteObject.unexportObject(reg, true);
+        } catch(Exception e) {
+            // ignore this, we will exit anyway
         }
-        UnicastRemoteObject.unexportObject(reg, true);
     }
     
     public Row[] getResults() {

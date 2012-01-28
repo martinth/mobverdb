@@ -86,13 +86,20 @@ public class ParallelSemiJoinServer extends UnicastRemoteObject implements ISemi
         }
         joinPerf.stopAll();
         
-        clients.clear();
+        for(ISemiJoinClient client : clients) {
+            try {
+                client.shutdown();
+            } catch(Exception e) {
+                // ignore this, we will exit anyway
+            }
+        }
+        
         try {
             Naming.unbind(BIND_NAME);
-        } catch (NotBoundException e) {
-            // we ignore this
+            UnicastRemoteObject.unexportObject(reg, true);
+        } catch(Exception e) {
+            // ignore this, we will exit anyway
         }
-        UnicastRemoteObject.unexportObject(reg, true);
     }
 
     @Override

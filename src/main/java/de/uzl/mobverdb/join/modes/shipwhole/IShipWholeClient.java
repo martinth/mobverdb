@@ -7,4 +7,5 @@ import de.uzl.mobverdb.join.data.Row;
 
 public interface IShipWholeClient extends Remote {
     public Row[] getData() throws RemoteException;
+    public void shutdown() throws RemoteException;
 }

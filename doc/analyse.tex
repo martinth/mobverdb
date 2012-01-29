@@ -35,9 +35,13 @@
 %\usepackage[skip=0pt,labelfont=it,nooneline,hang,small]{caption}
 \usepackage{enumerate}
 
-%%% Punkt + Komma Abstände bei Tausendern/Dezimalzahlen ans dt. anpassen
-%\mathcode`,="013B
-%\mathcode`.="613A
+%%% Listing
+\usepackage{listings}
+% a listing environment that doesn't allow page breaks
+\lstnewenvironment{code}[1][]%
+  {\minipage{\linewidth} 
+   \lstset{basicstyle=\ttfamily\footnotesize,frame=single,#1}}
+  {\endminipage}
 
 %%% Farben (Farben siehe: http://en.wikibooks.org/wiki/LaTeX/Colors)
 \usepackage{color}
@@ -85,12 +89,12 @@
 \begin{document}
 
 \section{Verteiltes Sortieren}
-\subsection{Umgebung}
+\subsection{Umgebung}\label{sort:umgebung}
 Um das verteilte Sortieren sinnvoll Testen zu könne, ist es notwendig die Ausführung auf mehrere Rechner zu verteilen. Eine rein lokale Ausführung würde zum einen keinen realistischen Kommunikationoverhead bedeuten, zum anderen wäre die Ausführung an die Leistungsfähigkeit der lokalen CPU gebunden.
 
 Die Messreihen wurden daher auf virtuellen Maschinen in der Amazon Elastic Compute Cloud (Amazon EC2)\footurl{http://aws.amazon.com/ec2/} ausgeführt. Die Ausführung erfolgte dabei jeweils für Server und jeden Client getrennt auf einer eigenen "`Micro"' Instanz. Zur Durchführung der Testreihen wurde mit Hilfe von Python, Fabric\footurl{http://fabfile.org} und boto\footurl{http://code.google.com/p/boto/} automatisiert und ausgeführt.
 
-\subsection{Durchführung der Messung}
+\subsection{Durchführung der Messung}\label{sort:messung}
 Die Performancemessung wird ausschließlich auf dem Server durchgeführt. Der Server misst dabei, wie viele Millisekunden er für das einlesen der zu sortierenden Daten, zum verteilen der Daten an die Clients sowie zum Interieren über die Sortierten Ergebnisse benötigt. Außerdem wird noch die gesamte Ausführugnszeit gemessen. Da es sich bei der Umgebung, in der das Sortieren durchgeführt wird, um virtuelle Maschinen handelt, ist die Ausführungszeit natürlich abhängig von der Auslastung der physikalischen Hosts. Es ist jedoch davon auszugehen, dass aufgrund der Tatsache, das Amazon die Instanzen über viele Rechner verteilt, ein brauchbarer Mittelwert entsteht.
 
 \subsection{Parameter der Messungen}
@@ -147,7 +151,7 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 10000 & 16 & 108 & 838 & 1177 & 8578 \\
 \hline
 \end{tabularx}
-\caption{Ergenisdaten: Verteiltes \textit{merge sort}}
+\caption{Ergebnisdaten: Verteiltes \textit{merge sort}}
 \end{table}
 Wie zu Erwarten besteht beim Merge-Sort ein direkter Zusammehang zwischen Blockgröße und der Gesamt-Ausführungszeit: Je höher die Blockgröße, destoe schneller die Gesamtzeit. Dies ist jeweils auf den kleineren $t_{iter}$ Wert zurückzuführen. Offenbar ist es Vorteilhaft, möglichste große Blöcke zu übertragen. Dies ist möglicherweise auf die TCP-basierte Kommunikation und den dabei verwendeten Slow-Start-Algorithmus zurückzuführen.
  
@@ -182,7 +186,7 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 10000 & 16 & 109 & 864 & 760 & 4351 \\
 \hline
 \end{tabularx}
-\caption{Ergenisdaten : Verteiltes \textit{distribution sort}}
+\caption{Ergebnisdaten: Verteiltes \textit{distribution sort}}
 \end{table}
 Auch beim Distribution-Sort besteht offenbar ein Zusammenhang zwischen Blockgröße und Ausführungszeit. Hierbei ist jedoch auffällig, dass die optimale Blockgröße (abermals bezogen auf diese Datenmenge) sehr dich an einem Wert von 1000 liegt. Darüber steigt die Ausführungszeit wieder leicht an. \todo{Kann man da noch was rein interpretieren?} 
 
@@ -190,6 +194,57 @@ Die optimale Client Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei di
 
 \subsubsection{Vergleich der verteilten Verfahren mit lokalem Sortieren}
 Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich. Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil. Denn für ein verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbunderen (linare) Aufwand hat allerdings einen, um ein vielfaches höheren Vorfaktor als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell, und der lokale Speicherzugriff unglaublich langsam ist, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen kann. Zu Beachten ist jedoch, dass dies nur gilt, solange die Daten im Vorneherein übertragen werden müssen.
- 
+
+\section{Verteilte Join Berechnung}
+\subsection{Umgebung}
+Die Durchführung der Messungen erfolgte, wie in \ref{sort:umgebung} beschrieben mittels einiger virtueller Instanzen auf Amazon Elastic Compute Cloud. Dabei wurden, je nach Join-Art, 2 bzw. 3 Instanzen verwendet.
+
+\subsection{Durchführung der Messung}
+Wie auch beim verteilten Sortieren wurde die Performancemessung ausschließlich auf dem Server durchgeführt (vgl. \ref{sort:messung}). Die folgenden Messgrößen wurden dabei erfasst:
+\begin{itemize}
+  \item $t_{prepare}$: Wie lange der Server zur Vorbereitung der Daten benötigt hat bevor sie versendet werden (z.B.: Erstellung des Bitvektors)
+  \item $t_{localjoin}$: Lokaler Joinaufwand (sei es zur Nachbearbeitung oder weil nur lokal gejoint wird). Sofern kein lokaler Join nötig war, ist dieser Wert 0
+  \item $t_{remotejoin}$: Verteilter Joinaufwand (inklusive der benötigten Kommunikationszeit vom Server zum Client und zurück)
+  \item $t_{total}$: Gesamte Ausführungszeit (beinhaltet die andereren Zeiten)
+\end{itemize}
+
+\subsection{Parameter der Messungen}
+Die Messreihen wurden jeweils mit 1 oder 2 Join-Clients und einem Server durchgeführt. Im Falle des Bitvektor-Joins wurden dabei Vektorgrößen von 10, 100 und 1000 getestet. Als Testdaten für das Joinen wurden dabei 3 unterschiedliche Datensätze verwendet, deren Einzelwerte jeweils aus einem zufällig generierten, numerischen Key und einem festen String bestehen.
+
+Listing \ref{lst:data} zeigt einen Ausschnitt aus diesen Daten. Die Keys wurden randomisiert erzeugt, allerdings wurde beim erzeugen der Testdaten darauf geachtet, dass es zwischen den einzelnen Datensätzen genügend Überschneidungen für einen sinnvollen Join gibt. 
+
+\begin{code}[label=lst:data,frame=tblr,caption=Auszug aus den Join-Testdaten]
+1773, DataA 0
+1911, DataA 1
+1551, DataA 2
+34, DataA 6
+[...]
+\end{code}
+
+\subsection{Auswertung}
+
+\begin{table}[htp]
+\begin{tabularx}{\textwidth}{ |X|c|c|c|c|c|c| }
+\hline
+Join-Typ & Blockgröße & $t_{prepare}$ & $t_{localjoin}$ & $t_{remotejoin}$  & $t_{total}$ & \# RMI calls \\
+\hline
+Lokal (nested loop) & - & 809 & 809 & 809 & 809 & 0 \\
+Ship-Whole & - & 0 & 757 & 0 & 943 & 2 \\
+Fetch-as-needed & - & 0 & 2496 & 0 & 2496 & 4000 \\
+Semi-Join & - & 0 & 557 & 176 & 735 & 1 \\
+Semi-Join (parallel) & - & 0 & 981 & 226 & 1209 & 2 \\
+Semi-Join (sequential) & - & 0 & 999 & 293 & 1294 & 2 \\
+Bitvektor & 10 & 12 & 593 & 105 & 1075 & 1 \\
+Bitvektor & 100 & 9 & 588 & 103 & 1058 & 1 \\
+Bitvektor & 1000 & 14 & 587 & 99 & 1058 & 1 \\
+\hline
+\end{tabularx}
+\caption{Ergebnisdaten: Verteiltes Joinen}
+\end{table}
+Auffällig ist, dass der Fetch-as-needed Join die mit abstand langsamste Join-Typ ist. Dies dürfte insbesondere mit der deutlich höheren Anzahl an RMI-Aufrufen zusammenhängen und insbesondere mit der damit verbundenen Latenz.
+
+Beim Bitvektor Join ist auffällig, das die Größe des Bitvektors, offenbar kaum Einfluss auf die Performance dieses Join-Typs hat. Womit dies zusammen hängt, ist unklar. 
+
+Insgesamt betrachtet liegen die einzelnen Join-Arten, bis auf den Fetch-as-needed Join, sehr dicht zusammen, was in sofern überraschend ist
 \end{document}
 

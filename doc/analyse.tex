@@ -90,29 +90,29 @@
 
 \section{Verteiltes Sortieren}
 \subsection{Umgebung}\label{sort:umgebung}
-Um das verteilte Sortieren sinnvoll Testen zu könne, ist es notwendig die Ausführung auf mehrere Rechner zu verteilen. Eine rein lokale Ausführung würde zum einen keinen realistischen Kommunikationoverhead bedeuten, zum anderen wäre die Ausführung an die Leistungsfähigkeit der lokalen CPU gebunden.
+Um das verteilte Sortieren sinnvoll Testen zu können, ist es notwendig die Ausführung auf mehrere Rechner zu verteilen. Eine rein lokale Ausführung würde zum einen keinen realistischen Kommunikationsoverhead bedeuten und zum anderen wäre die Ausführung an die Leistungsfähigkeit der lokalen CPU gebunden.
 
-Die Messreihen wurden daher auf virtuellen Maschinen in der Amazon Elastic Compute Cloud (Amazon EC2)\footurl{http://aws.amazon.com/ec2/} ausgeführt. Die Ausführung erfolgte dabei jeweils für Server und jeden Client getrennt auf einer eigenen "`Micro"' Instanz. Zur Durchführung der Testreihen wurde mit Hilfe von Python, Fabric\footurl{http://fabfile.org} und boto\footurl{http://code.google.com/p/boto/} automatisiert und ausgeführt.
+Die Messreihen wurden daher auf virtuellen Maschinen in der Amazon Elastic Compute Cloud (Amazon EC2)\footurl{http://aws.amazon.com/ec2/} ausgeführt. Die Ausführung erfolgte dabei jeweils für Server und jeden Client getrennt auf einer eigenen "`Micro"'-Instanz. Die Durchführung der Testreihen wurde mit Hilfe von Python, Fabric\footurl{http://fabfile.org} und boto\footurl{http://code.google.com/p/boto/} automatisiert und ausgeführt.
 
 \subsection{Durchführung der Messung}\label{sort:messung}
-Die Performancemessung wird ausschließlich auf dem Server durchgeführt. Der Server misst dabei, wie viele Millisekunden er für das einlesen der zu sortierenden Daten, zum verteilen der Daten an die Clients sowie zum Interieren über die Sortierten Ergebnisse benötigt. Außerdem wird noch die gesamte Ausführugnszeit gemessen. Da es sich bei der Umgebung, in der das Sortieren durchgeführt wird, um virtuelle Maschinen handelt, ist die Ausführungszeit natürlich abhängig von der Auslastung der physikalischen Hosts. Es ist jedoch davon auszugehen, dass aufgrund der Tatsache, das Amazon die Instanzen über viele Rechner verteilt, ein brauchbarer Mittelwert entsteht.
+Die Performance-Messung wird ausschließlich auf dem Server durchgeführt. Der Server misst dabei, wie viele Millisekunden er für das Einlesen der zu sortierenden Daten, zum verteilen der Daten an die Clients, sowie zum Iterieren über die sortierten Ergebnisse benötigt. Außerdem wird noch die gesamte Ausführungszeit gemessen. Da es sich bei der Umgebung, in der das Sortieren durchgeführt wird, um virtuelle Maschinen handelt, ist die Ausführungszeit natürlich abhängig von der Auslastung der physikalischen Hosts. Es ist jedoch davon auszugehen, dass aufgrund der Tatsache, das Amazon die Instanzen über viele Rechner verteilt, ein brauchbarer Mittelwert entsteht.
 
 \subsection{Parameter der Messungen}
-Die Messreihen wurden jeweils mit 2, 4, 8 und 16 Sortierclients und einem Server durchgeführt. Dabei wurden jeweils die Blockgrößen 10, 100, 1000 und 10000 getestet. Für die lokale Sortierung gelten diese Parameter natürlich nicht, hierbei wurde nur die Sortierung mittels \texttt{Colletions.sort()} ausgeführt. Als Daten die sortiert werden sollen wurden Goethes Faust I und II ausgewählt, die dem Projekt Gutenberg als Textdatei entnommen wurden. Die Testdatei hat dabei eine Dateigröße von 556 Kilobyte und wird vom Server vor der Verteilung an jedem Whitespace aufgetrennt. Dabei entstehen 81333 einzelne Strings, die dann Sortiert wurden.
+Die Messreihen wurden jeweils mit 2, 4, 8 und 16 Sortierclients und einem Server durchgeführt. Dabei wurden jeweils die Blockgrößen 10, 100, 1000 und 10000 getestet. Für die lokale Sortierung gelten diese Parameter natürlich nicht. Hierbei wurde nur die Sortierung mittels \texttt{Colletions.sort()} ausgeführt. Als Daten, die sortiert werden sollen, wurden Goethes Faust I und II ausgewählt, die dem Projekt Gutenberg als Textdatei entnommen wurden. Die Testdatei hat dabei eine Dateigröße von 556 Kilobyte und wird vom Server vor der Verteilung an jedem Whitespace aufgetrennt. Dabei entstehen 81333 einzelne Strings, die dann sortiert wurden.
 
 \subsection{Auswertung}
-Zur weiteren Referenz werden zunächst einmal die Messerte für das lokale Sortieren gegeben. 
-Die folgende Messerte sind dabei angegeben:
+Zur weiteren Referenz werden zunächst einmal die Messwerte für das lokale Sortieren gegeben. 
+Die folgenden Messwerte sind dabei angegeben:
 \begin{itemize}
-  \item Blockgröße: die verwende Blockgröße, d.h. wie viele Blöcke beim Iterieren über die sortierten Daten auf einmal vom Client zum Server übertragen werden.
-  \item \# Clients: wie viele Clients am Sortieren beteiligt waren
-  \item $t_{add}$: Wie lange der Server für das Einlesen der Daten und das Einfügen in eine lokale, unsortierte Liste benötigt hat.
-  \item $t_{distribute}$: Wie lange die der Server zum Aufteilen und Verteilen der unsortierten Daten an die Clients benötigt hat. Die Clients beginnen unmittelbar nach dem Übertragen der Daten mit der Sortierung.
-  \item $t_{iter}$: Wie lange der Server für der Iterieren über die sortierten Daten benötigt hat. Dies umfasst dabei auch die Kommunikationskosten - hier wirkt sich also die Blockgröße unmittelbar aus.
-  \item  $t_{total}$: Die gesamte Ausführungszeit. Dies beinhaltet alle anderen gemessene Zeiten plus den benötigten Verwaltungsoverhead.  
+  \item Blockgröße: Die Anzahl der Blöcke, die beim Iterieren über die sortierten Daten auf einmal vom Client zum Server übertragen werden.
+  \item \# Clients: Die Anzahl der Clients, die am Sortieren beteiligt waren
+  \item $t_{add}$: Die Zeit für das Einlesen der Daten und das Einfügen in eine lokale, unsortierte Liste benötigt hat.
+  \item $t_{distribute}$: Die Zeit, die der Server zum Aufteilen und Verteilen der unsortierten Daten an die Clients benötigt hat. Die Clients beginnen unmittelbar nach dem Übertragen der Daten mit der Sortierung.
+  \item $t_{iter}$: die Zeit, die der Server für das Iterieren über die sortierten Daten benötigt hat. Die Iterationszeit umfasst dabei auch die Kommunikationskosten - hier wirkt sich also die Blockgröße unmittelbar aus.
+  \item  $t_{total}$: Die gesamte Ausführungszeit. Die gesamte Ausführungszeit beinhaltet alle anderen gemessene Zeiten plus den benötigten Verwaltungsoverhead.  
 \end{itemize}
 
-Zunächst werden die Messwerte für das loakle Sortieren gegeben. Beim lokalen Sortieren wurden lediglich die Werte für das einfügen der Daten in einer lokale, unsortierte Liste ($t_{add}$), das Iterieren über die sortierten Ergebnisse ($t_{iter}$) und die Gesamtzeit gemessen, da die restlichen Messgrößen hierbei keine Rolle spielen. Auf die Ergebnisse wird an dieser Stelle nicht eingegangen, dies wird an späterer Stelle, im Zusammenhang mit den anderen Sortierverfahren erledigt. 
+Zunächst werden die Messwerte für das lokale Sortieren gegeben. Beim lokalen Sortieren wurden lediglich die Werte für das Einfügen der Daten in eine lokale, unsortierte Liste ($t_{add}$), das Iterieren über die sortierten Ergebnisse ($t_{iter}$) und die Gesamtzeit gemessen, da die restlichen Messgrößen hierbei keine Rolle spielen. Auf die Ergebnisse wird an dieser Stelle nicht eingegangen. Dies geschieht an späterer Stelle im Zusammenhang mit den anderen Sortierverfahren. 
 \begin{table}[htp]
 \begin{tabularx}{\textwidth}{ |X|X|X|X|X|X| }
 \hline
@@ -153,11 +153,11 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 \end{tabularx}
 \caption{Ergebnisdaten: Verteiltes \textit{merge sort}}
 \end{table}
-Wie zu Erwarten besteht beim Merge-Sort ein direkter Zusammehang zwischen Blockgröße und der Gesamt-Ausführungszeit: Je höher die Blockgröße, destoe schneller die Gesamtzeit. Dies ist jeweils auf den kleineren $t_{iter}$ Wert zurückzuführen. Offenbar ist es Vorteilhaft, möglichste große Blöcke zu übertragen. Dies ist möglicherweise auf die TCP-basierte Kommunikation und den dabei verwendeten Slow-Start-Algorithmus zurückzuführen.
+Wie zu erwarten, besteht beim Mergesort ein direkter Zusammenhang zwischen Blockgröße und der Gesamt-Ausführungszeit: Je höher die Blockgröße ist, desto kleiner ist die Gesamtzeit. Dies ist jeweils auf den kleineren Zeitwert $t_{iter}$ zurückzuführen. Offenbar ist es vorteilhaft, möglichst große Blöcke zu übertragen. Dies ist möglicherweise auf die TCP-basierte Kommunikation und den dabei verwendeten Slow-Start-Algorithmus zurückzuführen.
  
-Außerdem ist auffällig, dass die Variante mit nur 2 Clients die kürzeste Gesamt-Ausführungszeit hat. Dies resultiert dabei offensichtlich auf dem niedrigen Wert für $t_{distribute}$. Offenbar ist hiermit ein nicht unerheblicher Verwaltungs-Overhead verbunden, der durch der ausgelagerte Sortieren nicht wieder reingeholt werden kann.
+Außerdem ist auffällig, dass die Variante mit nur 2 Clients die kürzeste Gesamt-Ausführungszeit hat. Dies resultiert dabei offensichtlich auf dem niedrigen Wert für $t_{distribute}$. Offenbar ist hiermit ein nicht unerheblicher Verwaltungsoverhead verbunden, der durch das ausgelagerte Sortieren nicht wieder rein geholt werden kann.
 
-Ferner ist zu Bemerken, das der Unterschied zwischen der Blockgröße von 1000 und 10000 nichts so groß ausfällt, wie zwischen 1000 und den kleinere Blockgrößen. Offenbar liegt der Wert für die optimale Blockgröße (für diese Menge an zu sortierenden Daten) irgendwo zwischen diesen beiden Werten.
+Ferner ist zu bemerken, dass der Unterschied zwischen der Blockgröße von 1000 und 10000 nicht so groß ausfällt, wie zwischen 1000 und den kleineren Blockgrößen. Offenbar liegt der Wert für die optimale Blockgröße (für diese Menge an zu sortierenden Daten) irgendwo zwischen diesen beiden Werten.
 
 \subsubsection{Verteiltes \textit{distribution sort}}
 \begin{table}[htp]
@@ -188,12 +188,12 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 \end{tabularx}
 \caption{Ergebnisdaten: Verteiltes \textit{distribution sort}}
 \end{table}
-Auch beim Distribution-Sort besteht offenbar ein Zusammenhang zwischen Blockgröße und Ausführungszeit. Hierbei ist jedoch auffällig, dass die optimale Blockgröße (abermals bezogen auf diese Datenmenge) sehr dich an einem Wert von 1000 liegt. Darüber steigt die Ausführungszeit wieder leicht an. \todo{Kann man da noch was rein interpretieren?} 
+Auch beim Distributionsort besteht offenbar ein Zusammenhang zwischen Blockgröße und Ausführungszeit. Hierbei ist jedoch auffällig, dass die optimale Blockgröße (abermals bezogen auf diese Datenmenge) sehr dicht an einem Wert von 1000 liegt. Darüber steigt die Ausführungszeit wieder leicht an.
 
-Die optimale Client Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei die Werte für 2, 4 und 8 Clients ingesamt dichter beeinander liegen, als dies bei Mergesort der Fall war. Offenbar skaliert Distributionsort im Gegensatz zu Mergesort bei steigender Clientanzalh etwas besser. Dabei ist Distributionsort bei der hier vorliegenden Datenmenge im Optimalfall etwa um den Faktor 1,5 langsamder als Mergesort, was allerdings möglichweise auch auf Implementierugnsdetails zurück zu führen ist.
+Die optimale Client-Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei die Werte für 2, 4 und 8 Clients insgesamt dichter bei einander liegen, als dies bei Mergesort der Fall war. Offenbar skaliert Distributionsort im Gegensatz zu Mergesort bei steigender Client-Anzahl etwas besser. Dabei ist Distributionsort bei der hier vorliegenden Datenmenge im Optimalfall etwa um den Faktor 1,5 langsamer als Mergesort, was allerdings möglicherweise auch auf Implementierungsdetails zurück zu führen ist.
 
 \subsubsection{Vergleich der verteilten Verfahren mit lokalem Sortieren}
-Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich. Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil. Denn für ein verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbunderen (linare) Aufwand hat allerdings einen, um ein vielfaches höheren Vorfaktor als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell, und der lokale Speicherzugriff unglaublich langsam ist, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen kann. Zu Beachten ist jedoch, dass dies nur gilt, solange die Daten im Vorneherein übertragen werden müssen.
+Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich. Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit der Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil: Denn für das verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbundene (lineare) Aufwand hat allerdings einen, um ein vielfaches höheren, Vorfaktor, als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell und der lokale Speicherzugriff unglaublich langsam wäre, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen könnte. Zu beachten ist jedoch, dass dies nur gilt, solange die Daten im \todo{Vorneherein} übertragen werden müssen.
 
 \section{Verteilte Join Berechnung}
 \subsection{Umgebung}
@@ -246,5 +246,15 @@ Auffällig ist, dass der Fetch-as-needed Join die mit abstand langsamste Join-Ty
 Beim Bitvektor Join ist auffällig, das die Größe des Bitvektors, offenbar kaum Einfluss auf die Performance dieses Join-Typs hat. Womit dies zusammen hängt, ist unklar. 
 
 Insgesamt betrachtet liegen die einzelnen Join-Arten, bis auf den Fetch-as-needed Join, sehr dicht zusammen, was in sofern überraschend ist
+
+\begin{appendix}
+\section{Klassendiagramme}
+\begin{figure}[H]
+	\centering
+ 	\includegraphics[width=\textwidth]{Klassenstruktur.png}
+	\caption{Klassenstruktur: Sortierclient und -server}
+\end{figure}
+\end{appendix}
+
 \end{document}
 

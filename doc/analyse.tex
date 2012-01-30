@@ -193,25 +193,25 @@ Auch beim Distributionsort besteht offenbar ein Zusammenhang zwischen Blockgrö�
 Die optimale Client-Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei die Werte für 2, 4 und 8 Clients insgesamt dichter bei einander liegen, als dies bei Mergesort der Fall war. Offenbar skaliert Distributionsort im Gegensatz zu Mergesort bei steigender Client-Anzahl etwas besser. Dabei ist Distributionsort bei der hier vorliegenden Datenmenge im Optimalfall etwa um den Faktor 1,5 langsamer als Mergesort, was allerdings möglicherweise auch auf Implementierungsdetails zurück zu führen ist.
 
 \subsubsection{Vergleich der verteilten Verfahren mit lokalem Sortieren}
-Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich. Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit der Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil: Denn für das verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbundene (lineare) Aufwand hat allerdings einen, um ein vielfaches höheren, Vorfaktor, als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell und der lokale Speicherzugriff unglaublich langsam wäre, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen könnte. Zu beachten ist jedoch, dass dies nur gilt, solange die Daten im \todo{Vorneherein} übertragen werden müssen.
+Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich. Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit der Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil: Denn für das verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbundene (lineare) Aufwand hat allerdings einen, um ein vielfaches höheren, Vorfaktor, als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell und der lokale Speicherzugriff unglaublich langsam wäre, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen könnte. Zu beachten ist jedoch, dass dies nur gilt, solange die Daten im vorne herein übertragen werden müssen.
 
 \section{Verteilte Join Berechnung}
 \subsection{Umgebung}
-Die Durchführung der Messungen erfolgte, wie in \ref{sort:umgebung} beschrieben mittels einiger virtueller Instanzen auf Amazon Elastic Compute Cloud. Dabei wurden, je nach Join-Art, 2 bzw. 3 Instanzen verwendet.
+Die Durchführung der Messungen erfolgte, wie in \ref{sort:umgebung} beschrieben mittels einiger virtueller Instanzen auf Amazon Elastic Compute Cloud. Dabei wurden (je nach Join-Art) 2 bzw. 3 Instanzen verwendet.
 
 \subsection{Durchführung der Messung}
 Wie auch beim verteilten Sortieren wurde die Performancemessung ausschließlich auf dem Server durchgeführt (vgl. \ref{sort:messung}). Die folgenden Messgrößen wurden dabei erfasst:
 \begin{itemize}
-  \item $t_{prepare}$: Wie lange der Server zur Vorbereitung der Daten benötigt hat bevor sie versendet werden (z.B.: Erstellung des Bitvektors)
-  \item $t_{localjoin}$: Lokaler Joinaufwand (sei es zur Nachbearbeitung oder weil nur lokal gejoint wird). Sofern kein lokaler Join nötig war, ist dieser Wert 0
-  \item $t_{remotejoin}$: Verteilter Joinaufwand (inklusive der benötigten Kommunikationszeit vom Server zum Client und zurück)
-  \item $t_{total}$: Gesamte Ausführungszeit (beinhaltet die andereren Zeiten)
+  \item $t_{prepare}$: Die Zeit, die der Server zur Vorbereitung der Daten benötigt hat bevor sie versendet werden (z.B. Erstellung des Bitvektors).
+  \item $t_{localjoin}$: Lokaler Joinaufwand (sei es zur Nachbearbeitung oder weil nur lokal gejoint wird). Sofern kein lokaler Join nötig war, ist dieser Wert 0.
+  \item $t_{remotejoin}$: Verteilter Joinaufwand (inklusive der benötigten Kommunikationszeit vom Server zum Client und zurück).
+  \item $t_{total}$: Gesamte Ausführungszeit (beinhaltet die anderen Zeiten).
 \end{itemize}
 
 \subsection{Parameter der Messungen}
 Die Messreihen wurden jeweils mit 1 oder 2 Join-Clients und einem Server durchgeführt. Im Falle des Bitvektor-Joins wurden dabei Vektorgrößen von 10, 100 und 1000 getestet. Als Testdaten für das Joinen wurden dabei 3 unterschiedliche Datensätze verwendet, deren Einzelwerte jeweils aus einem zufällig generierten, numerischen Key und einem festen String bestehen.
 
-Listing \ref{lst:data} zeigt einen Ausschnitt aus diesen Daten. Die Keys wurden randomisiert erzeugt, allerdings wurde beim erzeugen der Testdaten darauf geachtet, dass es zwischen den einzelnen Datensätzen genügend Überschneidungen für einen sinnvollen Join gibt. 
+Listing \ref{lst:data} zeigt einen Ausschnitt aus diesen Daten. Die Keys wurden randomisiert erzeugt. Allerdings wurde beim erzeugen der Testdaten darauf geachtet, dass es zwischen den einzelnen Datensätzen genügend Überschneidungen für einen sinnvollen Join gibt. 
 
 \begin{code}[label=lst:data,frame=tblr,caption=Auszug aus den Join-Testdaten]
 1773, DataA 0
@@ -241,11 +241,11 @@ Bitvektor & 1000 & 14 & 587 & 99 & 1058 & 1 \\
 \end{tabularx}
 \caption{Ergebnisdaten: Verteiltes Joinen}
 \end{table}
-Auffällig ist, dass der Fetch-as-needed Join die mit abstand langsamste Join-Typ ist. Dies dürfte insbesondere mit der deutlich höheren Anzahl an RMI-Aufrufen zusammenhängen und insbesondere mit der damit verbundenen Latenz.
+Auffällig ist, dass der Fetch-as-needed Join der mit Abstand langsamste Join-Typ ist. Dies dürfte insbesondere mit der deutlich höheren Anzahl an RMI-Aufrufen zusammenhängen und insbesondere mit der damit verbundenen Latenz.
 
-Beim Bitvektor Join ist auffällig, das die Größe des Bitvektors, offenbar kaum Einfluss auf die Performance dieses Join-Typs hat. Womit dies zusammen hängt, ist unklar. 
+Beim Bitvektor-Join ist auffällig, das die Größe des Bitvektors offenbar kaum Einfluss auf die Performance dieses Join-Typs hat. Womit dies zusammen hängt ist unklar. 
 
-Insgesamt betrachtet liegen die einzelnen Join-Arten, bis auf den Fetch-as-needed Join, sehr dicht zusammen. Dies ist in sofern überraschend, da die Join-Arten sehr unterschiedliche Charakteristika aufweisen.
+Insgesamt betrachtet, liegen die einzelnen Join-Arten (bis auf den Fetch-as-needed Join) sehr dicht zusammen. Dies ist in sofern überraschend, da die Join-Arten sehr unterschiedliche Charakteristika aufweisen.
 
 \begin{appendix}
 \section{Klassendiagramme}

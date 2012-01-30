@@ -1,0 +1,110 @@
+=============
+Requirenments
+=============
+	The main code is written in Java and uses Maven for packaging.
+
+		* Java (=1.6) to run sort und join test programs
+		* Maven (>=2.2.1) to build the test programs
+		* Python (>=2.5) to run the fabric file and the join-data generation
+		
+	The test programs can be run locally or on Amazon EC2. To run on Amazon EC2
+	you additionally need:
+
+			* fabric (http://fabfile.org/)
+			* boto (http://code.google.com/p/boto/)
+		
+	Both can be installed using pip (http://pypi.python.org/pypi/pip). 
+
+========
+Building
+========
+	To build the to test programs simply run:
+	
+		mvn package
+
+	This will download all requirenments and create to runnable JAR files in the
+	target/ directory.
+
+=========================
+Running the test programs
+=========================
+	
+	The two main runnable files are
+
+		target/sorting-runnable.jar
+		target/joiner-runnable.jar
+
+	which can by run using "java -jar <jar-file> <arguments>.
+
+-------
+Sorting
+-------
+
+	There are two modes: Server mode and client mode. In server mode, the programs
+	waits until a defined amount of clients is connected, runs the test, writes a
+	perf.log file with the results and then exits. I.e.:
+
+		java -jar sorting-runnable.jar --server 3 faust.txt
+	
+	Will start the server that waits for 3 clients and will sort the contents of
+	faust.txt. You can use the --distsort or --localsort switches to use a
+	different sort type.
+	Note: --localsort will cause the server to ignore the defined client-count
+			  and will result in a simple, local sort.
+
+	To run a client use the --clients switch a provide the IP/hostname as a
+	parameter. I.e.:
+
+		java -jar sorting.runnable --client 127.0.0.1
+
+	will cause the clients to connect to a server (that must already be running!)
+	on localhost.
+
+-------
+Joining
+-------
+	
+	In server mode the program waits for a defined amount of clients to connect.
+	How many clients are needed (one or two) depends on the selected join mode.
+	The server program also requires one or two files as parameter (depending on 
+	selected mode). The following table lists the modes, how man clients and how
+	many input files are needed:
+
+	Mode (cmdline swtich)		# clients			# files
+	---------------------------------------------
+		--bitvektor						1							1	
+		--fetch-needed				1							1	
+		--local								0							2	
+		--semi								1							1	
+		--semi-parallel				2							1	
+		--semi-sequential			2							1	
+		--ship-whole					2							0	
+
+	
+	For client mode, the program needs the --connect-to switch. The parameter
+	to --connect-to is the IP/hostname of the server (which must already be running).
+	You must use the same mode switch as for the server, otherwise the program will
+	crash! The client ALWAYS requires a data file as parameter!
+
+	To sum this up, here are some examples:
+	
+	fetch-as-needed joining
+	-----------------------
+		Start the server:
+			java -jar joiner-runnable.jar --fetch-needed join-data-a.csv
+
+		Then, run a client:
+			java -jar joiner-runnable.jar --fetch-needed --connect-to 127.0.0.1 join-data-b.csv
+
+		After the server has run, both programs will terminate and the server will
+		have writter a perf.log file.
+	
+	semi-join (in parallel)
+	-----------------------
+
+		Start the server:
+			java -jar target/joiner-runnable.jar --semi-parallel join-data-base.csv
+
+		The, start TWO clients:
+			java -jar joiner-runnable.jar --semi-parallel -c 127.0.0.1 join-data-a.csv
+			java -jar joiner-runnable.jar --semi-parallel -c 127.0.0.1 join-data-b.csv

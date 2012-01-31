@@ -153,14 +153,28 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 \end{tabularx}
 \caption{Ergebnisdaten: Verteiltes \textit{merge sort}}
 \end{table}
-Wie zu erwarten, besteht beim Mergesort ein direkter Zusammenhang zwischen Blockgröße und der Gesamt-Ausführungszeit: Je höher die Blockgröße ist, desto kleiner ist die Gesamtzeit. Dies ist jeweils auf den kleineren Zeitwert $t_{iter}$ zurückzuführen. Offenbar ist es vorteilhaft, möglichst große Blöcke zu übertragen. Dies ist möglicherweise auf die TCP-basierte Kommunikation und den dabei verwendeten Slow-Start-Algorithmus zurückzuführen.
- 
-Außerdem ist auffällig, dass die Variante mit nur 2 Clients die kürzeste Gesamt-Ausführungszeit hat. Dies resultiert dabei offensichtlich auf dem niedrigen Wert für $t_{distribute}$. Offenbar ist hiermit ein nicht unerheblicher Verwaltungsoverhead verbunden, der durch das ausgelagerte Sortieren nicht wieder rein geholt werden kann.
+Wie zu erwarten, besteht beim Mergesort ein direkter Zusammenhang zwischen Blockgröße und der Gesamt-Ausführungszeit: Je höher die Blockgröße ist, desto kleiner ist die Gesamtzeit (vgl. Abbildung \ref{fig.ms.compare.blocksize}). Dies ist jeweils auf den kleineren Zeitwert $t_{iter}$ zurückzuführen. Offenbar ist es vorteilhaft, möglichst große Blöcke zu übertragen. Dies ist möglicherweise auf die TCP-basierte Kommunikation und den dabei verwendeten Slow-Start-Algorithmus zurückzuführen.
 
-Ferner ist zu bemerken, dass der Unterschied zwischen der Blockgröße von 1000 und 10000 nicht so groß ausfällt, wie zwischen 1000 und den kleineren Blockgrößen. Offenbar liegt der Wert für die optimale Blockgröße (für diese Menge an zu sortierenden Daten) irgendwo zwischen diesen beiden Werten.
+Außerdem ist zu bemerken, dass der Unterschied zwischen der Blockgröße von 1000 und 10000 nicht so groß ausfällt, wie zwischen 1000 und den kleineren Blockgrößen. Offenbar liegt der Wert für die optimale Blockgröße (für diese Menge an zu sortierenden Daten) irgendwo zwischen diesen beiden Werten.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/block_ms.png}
+	\caption{Ausführungszeit unter Variation der Blockgröße (merge sort)}
+	\label{fig.ms.compare.blocksize}
+\end{figure}
+ 
+Ferner ist auffällig, dass die Variante mit nur 2 Clients die kürzeste Gesamt-Ausführungszeit hat. Dies resultiert dabei offensichtlich auf dem niedrigen Wert für $t_{distribute}$. Offenbar ist hiermit ein nicht unerheblicher Verwaltungsoverhead verbunden, der durch das ausgelagerte Sortieren nicht wieder rein geholt werden kann (vgl. Abbildung \ref{fig.ms.compare.clientcount}).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/block_ms.png}
+	\caption{Ausführungszeit unter Variation der Client-Anzahl (merge sort)}
+	\label{fig.ms.compare.clientcount}
+\end{figure}
 
 \subsubsection{Verteiltes \textit{distribution sort}}
-\begin{table}[htp]
+\begin{table}[H]
 \begin{tabularx}{\textwidth}{ |X|X|X|X|X|X| }
 \hline
 Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ (ms) & $t_{total}$ (ms) \\
@@ -188,12 +202,34 @@ Blockgröße & \# Clients & $t_{add}$ (ms) & $t_{distribute}$ (ms) & $t_{iter}$ 
 \end{tabularx}
 \caption{Ergebnisdaten: Verteiltes \textit{distribution sort}}
 \end{table}
-Auch beim Distributionsort besteht offenbar ein Zusammenhang zwischen Blockgröße und Ausführungszeit. Hierbei ist jedoch auffällig, dass die optimale Blockgröße (abermals bezogen auf diese Datenmenge) sehr dicht an einem Wert von 1000 liegt. Darüber steigt die Ausführungszeit wieder leicht an.
+Auch beim Distributionsort besteht offenbar ein Zusammenhang zwischen Blockgröße und Ausführungszeit. Hierbei ist jedoch auffällig, dass die optimale Blockgröße (abermals bezogen auf diese Datenmenge) sehr dicht an einem Wert von 1000 liegt. Darüber steigt die Ausführungszeit wieder leicht an. Abbildung \ref{fig.ds.compare.blocksize} zeigt diesen Umstand.
 
-Die optimale Client-Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei die Werte für 2, 4 und 8 Clients insgesamt dichter bei einander liegen, als dies bei Mergesort der Fall war. Offenbar skaliert Distributionsort im Gegensatz zu Mergesort bei steigender Client-Anzahl etwas besser. Dabei ist Distributionsort bei der hier vorliegenden Datenmenge im Optimalfall etwa um den Faktor 1,5 langsamer als Mergesort, was allerdings möglicherweise auch auf Implementierungsdetails zurück zu führen ist.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/block_ds.png}
+	\caption{Ausführungszeit unter Variation der Blockgröße (distribution sort)}
+	\label{fig.ds.compare.blocksize}
+\end{figure}
+
+Die optimale Client-Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei die Werte für 2, 4 und 8 Clients insgesamt dichter bei einander liegen, als dies bei Mergesort der Fall war (vgl. Abbildung \ref{fig.ds.compare.clientcount}). Offenbar skaliert Distributionsort im Gegensatz zu Mergesort bei steigender Client-Anzahl etwas besser. Dabei ist Distributionsort bei der hier vorliegenden Datenmenge im Optimalfall etwa um den Faktor 1,5 langsamer als Mergesort, was allerdings möglicherweise auch auf Implementierungsdetails zurück zu führen ist.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/block_ds.png}
+	\caption{Ausführungszeit unter Variation der Client-Anzahl (distribution sort)}
+	\label{fig.ds.compare.clientcount}
+\end{figure}
 
 \subsubsection{Vergleich der verteilten Verfahren mit lokalem Sortieren}
-Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich. Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit der Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil: Denn für das verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbundene (lineare) Aufwand hat allerdings einen, um ein vielfaches höheren, Vorfaktor, als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell und der lokale Speicherzugriff unglaublich langsam wäre, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen könnte. Zu beachten ist jedoch, dass dies nur gilt, solange die Daten im vorne herein übertragen werden müssen.
+Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich (cgl. Abbildung \ref{fig.local.compare}). Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit der Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil: Denn für das verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbundene (lineare) Aufwand hat allerdings einen, um ein vielfaches höheren, Vorfaktor, als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell und der lokale Speicherzugriff unglaublich langsam wäre, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen könnte. Zu beachten ist jedoch, dass dies nur gilt, solange die Daten im vorne herein übertragen werden müssen.
+
+\begin{figure}[H]
+	\centering
+	\subfloat{\includegraphics[width=0.49\textwidth]{results/sort/diagrams/block_vergleich.png}}
+	\subfloat{\includegraphics[width=0.49\textwidth]{results/sort/diagrams/clients_vergleich.png}}
+	\caption{Vergleich des verteilten Sortierens mit lokalem}
+	\label{fig.local.compare}
+\end{figure}
 
 \section{Verteilte Join Berechnung}
 \subsection{Umgebung}
@@ -251,10 +287,21 @@ Insgesamt betrachtet, liegen die einzelnen Join-Arten (bis auf den Fetch-as-need
 \section{Klassendiagramme}
 \begin{figure}[H]
 	\centering
- 	\includegraphics[width=\textwidth]{Klassenstruktur.png}
+ 	\includegraphics[width=\textwidth]{class-diagrams/sort.png}
 	\caption{Klassenstruktur: Sortierclient und -server}
 \end{figure}
-\end{appendix}
 
+\begin{figure}[H]
+	\centering
+ 	\includegraphics[width=\textwidth]{class-diagrams/join-packages.png}
+	\caption{Paketstruktur: Joinclient und -server}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+ 	\includegraphics[width=\textwidth]{class-diagrams/join.png}
+	\caption{Klassenstruktur: Joinclient und -server}
+\end{figure}
+\end{appendix}
 \end{document}
 

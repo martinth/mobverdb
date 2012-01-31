@@ -64,7 +64,7 @@
 \pagestyle{fancy}
 \setlength{\headheight}{30pt}
 \lhead{Hausaufgabe zur Vorlesung \\\emph{Mobile und verteilte Datenbanken}}
-\rhead{Dennis Krüger ()\\Martin Thurau (612016)}
+\rhead{Dennis Krüger (612359)\\Martin Thurau (612016)}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 \chead{}
@@ -168,7 +168,7 @@ Ferner ist auffällig, dass die Variante mit nur 2 Clients die kürzeste Gesamt-
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/block_ms.png}
+	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/clients_ms.png}
 	\caption{Ausführungszeit unter Variation der Client-Anzahl (merge sort)}
 	\label{fig.ms.compare.clientcount}
 \end{figure}
@@ -215,19 +215,19 @@ Die optimale Client-Anzahl liegt in diesem Fall offenbar bei 4 Clients, wobei di
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/block_ds.png}
+	\includegraphics[width=0.7\textwidth]{results/sort/diagrams/clients_ds.png}
 	\caption{Ausführungszeit unter Variation der Client-Anzahl (distribution sort)}
 	\label{fig.ds.compare.clientcount}
 \end{figure}
 
 \subsubsection{Vergleich der verteilten Verfahren mit lokalem Sortieren}
-Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich (cgl. Abbildung \ref{fig.local.compare}). Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit der Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil: Denn für das verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbundene (lineare) Aufwand hat allerdings einen, um ein vielfaches höheren, Vorfaktor, als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell und der lokale Speicherzugriff unglaublich langsam wäre, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen könnte. Zu beachten ist jedoch, dass dies nur gilt, solange die Daten im vorne herein übertragen werden müssen.
+Vergleicht man die beiden verteilten Sortierverfahren mit den Ergebnissen des lokalen Sortierens wird die völlige Unterlegenheit der verteilten Verfahren ersichtlich (vgl. Abbildung \ref{fig.local.compare}). Dieses Ergebnis ist auch nicht weiter verwunderlich. Zwar lässt sich lokales und auch verteiltes Sortieren im Wesentlichen mit der Komplexität von O($n \log n$) abschätzen, jedoch hat das verteilte Sortieren einen gravierenden Nachteil: Denn für das verteiltes Sortieren ist es zunächst einmal erforderlich die Daten komplett an die Clients zu übertragen. Der damit verbundene (lineare) Aufwand hat allerdings einen, um ein vielfaches höheren, Vorfaktor, als das lokal der Fall wäre. Sofern das Übertragungsmedium also nicht unglaublich schnell und der lokale Speicherzugriff unglaublich langsam wäre, ist es unwahrscheinlich, dass das verteilte Sortieren das lokale je schlagen könnte. Zu beachten ist jedoch, dass dies nur gilt, solange die Daten im vorne herein übertragen werden müssen.
 
 \begin{figure}[H]
 	\centering
 	\subfloat{\includegraphics[width=0.49\textwidth]{results/sort/diagrams/block_vergleich.png}}
 	\subfloat{\includegraphics[width=0.49\textwidth]{results/sort/diagrams/clients_vergleich.png}}
-	\caption{Vergleich des verteilten Sortierens mit lokalem}
+	\caption{Vergleich des verteilten Sortierens mit lokalem Sortieren}
 	\label{fig.local.compare}
 \end{figure}
 
